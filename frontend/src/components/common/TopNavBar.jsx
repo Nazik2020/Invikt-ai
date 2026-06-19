@@ -22,8 +22,8 @@ const TopNavBar = () => {
             
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center gap-4">
-                <Link to="/dashboard" className="text-slate-400 font-semibold px-4 py-2 hover:text-white transition-colors">Sign In</Link>
-                <Link to="/dashboard" className="bg-gradient-to-br from-violet-300 to-violet-600 text-on-primary px-6 py-2.5 rounded-full font-bold hover:scale-105 transition-transform duration-200 shadow-lg shadow-violet-500/20">Get Started</Link>
+                <Link to="/signin" className="text-slate-400 font-semibold px-4 py-2 hover:text-white transition-colors">Sign In</Link>
+                <Link to="/signup" className="bg-gradient-to-br from-violet-300 to-violet-600 text-on-primary px-6 py-2.5 rounded-full font-bold hover:scale-105 transition-transform duration-200 shadow-lg shadow-violet-500/20">Get Started</Link>
             </div>
 
             {/* Mobile Hamburger Icon */}
@@ -45,8 +45,8 @@ const TopNavBar = () => {
                     <Link to="/learning-hub" onClick={() => setIsMobileMenuOpen(false)} className="text-slate-300 font-semibold hover:text-white">Resources</Link>
                     <a href="#about" onClick={() => setIsMobileMenuOpen(false)} className="text-slate-300 font-semibold hover:text-white">About</a>
                     <div className="w-full h-px bg-white/10 my-2"></div>
-                    <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-slate-300 font-semibold">Sign In</Link>
-                    <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="w-11/12 text-center bg-gradient-to-br from-violet-300 to-violet-600 text-on-primary px-6 py-3 rounded-full font-bold">Get Started Free</Link>
+                    <Link to="/signin" onClick={() => setIsMobileMenuOpen(false)} className="text-slate-300 font-semibold">Sign In</Link>
+                    <Link to="/signup" onClick={() => setIsMobileMenuOpen(false)} className="w-11/12 text-center bg-gradient-to-br from-violet-300 to-violet-600 text-on-primary px-6 py-3 rounded-full font-bold">Get Started Free</Link>
                 </div>
             )}
         </nav>

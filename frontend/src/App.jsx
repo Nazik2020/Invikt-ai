@@ -14,6 +14,9 @@ import CareerPathPage from './pages/CareerPathPage';
 import LearningHubPage from './pages/LearningHubPage';
 import RoadmapDetail from './components/career/RoadmapDetail';
 import JobTrackerPage from './pages/JobTrackerPage';
+import SignInPage from './pages/SignInPage';
+import SignUpPage from './pages/SignUpPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 const App = () => {
   return (
@@ -22,6 +25,10 @@ const App = () => {
         <Route path="/" element={<PublicLayout />}>
           <Route index element={<LandingPage />} />
         </Route>
+        
+        <Route path="/signin" element={<SignInPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/forgot-password" element={<ResetPasswordPage />} />
         
         <Route path="/" element={<DashboardLayout />}>
           <Route path="dashboard" element={<DashboardPage />} />
