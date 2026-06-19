@@ -1,0 +1,17 @@
+# Vite local cache (never commit this)
+.vite
+
+# Dependencies
+node_modules
+
+# Build output
+dist
+dist-ssr
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
