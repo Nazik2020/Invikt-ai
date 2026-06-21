@@ -8,16 +8,12 @@ const ResetPasswordPage = () => {
     const [isSubmitted, setIsSubmitted] = useState(false);
     
     const leftContent = (
-        <div className="flex flex-col h-full items-center justify-center text-center">
-            <div className="flex flex-col items-center max-w-md w-full">
+        <div className="flex flex-col h-full justify-between items-center text-center">
+            <div className="flex flex-col items-center max-w-md w-full my-auto">
                 {/* Logo */}
-                <div className="flex items-center gap-3 mb-10">
-                    <div className="w-12 h-12 rounded-full bg-[#814df3] flex items-center justify-center shadow-[0_0_20px_rgba(129,77,243,0.5)]">
-                        {/* Using logo icon or material icon */}
-                        <span className="material-symbols-outlined text-white text-2xl">architecture</span>
-                    </div>
-                    <span className="text-2xl font-bold tracking-tight text-white">Invikt AI</span>
-                </div>
+                <Link to="/" className="inline-block mb-8 -ml-2">
+                    <img src={logo} alt="Invikt" className="h-10 md:h-12 w-auto object-contain" />
+                </Link>
 
                 {/* Verified Secure Badge */}
                 <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/5 bg-[#17181c] mb-6">
@@ -48,12 +44,16 @@ const ResetPasswordPage = () => {
                     </div>
                 </div>
             </div>
+            
+            <div className="text-[0.65rem] tracking-[0.2em] font-black text-white/30 uppercase mt-auto pt-12 shrink-0">
+                © 2026 INVIKT. CONQUER YOUR CAREER.
+            </div>
         </div>
     );
 
     return (
         <AuthLayout leftContent={leftContent}>
-            <div className="w-full h-full flex flex-col justify-center max-w-[420px] mx-auto min-h-[calc(100vh-80px)]">
+            <div className="w-full">
                 <div className="mb-10">
                     <h2 className="text-[32px] font-bold text-white mb-3 tracking-tight">Reset your password</h2>
                     <p className="text-[15px] text-white/70">
@@ -103,19 +103,6 @@ const ResetPasswordPage = () => {
                         <span className="material-symbols-outlined text-[18px] mr-2 group-hover:-translate-x-1 transition-transform">arrow_back</span>
                         Back to Sign In
                     </Link>
-                </div>
-            </div>
-
-            {/* Right Panel Footer */}
-            <div className="absolute bottom-8 left-0 w-full px-6 sm:px-12">
-                <div className="max-w-[420px] mx-auto border-t border-white/5 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div className="text-[10px] tracking-[0.15em] font-bold text-white/30 uppercase">
-                        © 2024 INVIKT AI. UNCONQUERED.
-                    </div>
-                    <div className="flex gap-6">
-                        <a href="#" className="text-[10px] tracking-[0.15em] font-bold text-white/30 hover:text-white/60 uppercase transition-colors">Privacy</a>
-                        <a href="#" className="text-[10px] tracking-[0.15em] font-bold text-white/30 hover:text-white/60 uppercase transition-colors">Support</a>
-                    </div>
                 </div>
             </div>
         </AuthLayout>

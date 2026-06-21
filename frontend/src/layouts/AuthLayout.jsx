@@ -16,16 +16,18 @@ const AuthLayout = ({ children, leftContent }) => {
             </div>
 
             {/* Right Panel - Form Area */}
-            <div className="flex-1 flex flex-col justify-center items-center p-6 sm:p-12 bg-[#111216] relative min-h-screen">
-                {/* Mobile Logo */}
-                <div className="lg:hidden absolute top-6 sm:top-8 left-6 sm:left-8">
-                    <Link to="/">
-                        <img src={logo} alt="Invikt" className="h-10 w-auto object-contain" />
-                    </Link>
-                </div>
-                
-                <div className="w-full max-w-[420px] relative z-10 mt-12 lg:mt-0">
-                    {children}
+            <div className="flex-1 flex flex-col lg:justify-center items-center p-6 sm:p-12 bg-[#111216] relative min-h-screen lg:min-h-0">
+                <div className="w-full max-w-[420px] pt-8 lg:pt-0 relative z-10 flex flex-col h-full lg:h-auto">
+                    {/* Mobile Logo */}
+                    <div className="lg:hidden mb-12">
+                        <Link to="/" className="inline-block -ml-2">
+                            <img src={logo} alt="Invikt" className="h-10 w-auto object-contain" />
+                        </Link>
+                    </div>
+                    
+                    <div className="flex-1 flex flex-col justify-center lg:block">
+                        {children}
+                    </div>
                 </div>
             </div>
         </div>

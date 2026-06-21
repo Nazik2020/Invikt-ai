@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 const stages = [
     { key: 'WISHLIST', name: 'Wishlist', dot: 'bg-gray-400', badgeStyle: 'bg-white/5 text-white/50 border-white/5' },
@@ -469,8 +470,8 @@ const JobTrackerPage = () => {
             </div>
 
             {/* ── Modal Overlay Form (Add Application) ── */}
-            {showAddModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pt-16 md:pt-4">
+            {showAddModal && createPortal(
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
                     {/* Backdrop */}
                     <div
                         onClick={() => {
@@ -481,7 +482,7 @@ const JobTrackerPage = () => {
                     />
 
                     {/* Form Container */}
-                    <div className="relative z-10 w-full max-w-[calc(100vw-2.5rem)] sm:max-w-xl rounded-3xl bg-[#131417] border border-white/10 p-5 sm:p-8 md:p-10 shadow-[0_30px_70px_rgba(0,0,0,0.85)] max-h-[calc(100vh-5rem)] md:max-h-[90vh] overflow-y-auto no-scrollbar">
+                    <div className="relative z-10 w-full max-w-[calc(100vw-2rem)] sm:max-w-xl rounded-3xl bg-[#131417] border border-white/10 p-5 sm:p-8 md:p-10 shadow-[0_30px_70px_rgba(0,0,0,0.85)] max-h-[90vh] overflow-y-auto no-scrollbar">
                         
                         {/* Top-Right Close Button */}
                         <button
@@ -490,13 +491,13 @@ const JobTrackerPage = () => {
                                 setShowAddModal(false);
                                 setTriedSubmit(false);
                             }}
-                            className="absolute top-6 right-6 text-white/30 hover:text-white/80 p-2 rounded-full hover:bg-white/5 transition-all"
+                            className="absolute top-5 right-5 text-white/30 hover:text-white/80 p-2 rounded-full hover:bg-white/5 transition-all"
                             aria-label="Close modal"
                         >
                             <span className="material-symbols-outlined text-[20px]">close</span>
                         </button>
 
-                        <div className="text-center space-y-1 mb-8">
+                        <div className="space-y-1 mb-8 pr-10">
                             <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">Add New Application</h2>
                             <p className="text-white/40 text-xs font-semibold">Enter the details of your latest career venture.</p>
                         </div>
@@ -510,7 +511,7 @@ const JobTrackerPage = () => {
                                         value={companyName}
                                         onChange={e => setCompanyName(e.target.value)}
                                         placeholder="e.g. Linear"
-                                        className={`w-full bg-[#1c1d22]/50 border rounded-xl px-4 py-3 text-[0.85rem] text-white/80 placeholder:text-white/20 focus:outline-none focus:border-primary/45 transition-all
+                                        className={`w-full bg-[#121316] border rounded-xl px-4 py-3 text-[0.85rem] text-white placeholder:text-white/40 focus:outline-none focus:border-primary/45 transition-all
                                             ${triedSubmit && !companyName.trim() 
                                                 ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
                                                 : 'border-white/5'
@@ -527,7 +528,7 @@ const JobTrackerPage = () => {
                                         value={jobTitle}
                                         onChange={e => setJobTitle(e.target.value)}
                                         placeholder="e.g. Senior Designer"
-                                        className={`w-full bg-[#1c1d22]/50 border rounded-xl px-4 py-3 text-[0.85rem] text-white/80 placeholder:text-white/20 focus:outline-none focus:border-primary/45 transition-all
+                                        className={`w-full bg-[#121316] border rounded-xl px-4 py-3 text-[0.85rem] text-white placeholder:text-white/40 focus:outline-none focus:border-primary/45 transition-all
                                             ${triedSubmit && !jobTitle.trim() 
                                                 ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
                                                 : 'border-white/5'
@@ -551,7 +552,7 @@ const JobTrackerPage = () => {
                                             value={jobUrl}
                                             onChange={e => setJobUrl(e.target.value)}
                                             placeholder="https://careers.company.co"
-                                            className="w-full bg-[#1c1d22]/50 border border-white/5 rounded-xl pl-11 pr-4 py-3 text-[0.85rem] text-white/80 placeholder:text-white/20 focus:outline-none focus:border-primary/45 transition-all"
+                                            className="w-full bg-[#121316] border border-white/5 rounded-xl pl-11 pr-4 py-3 text-[0.85rem] text-white placeholder:text-white/40 focus:outline-none focus:border-primary/45 transition-all"
                                         />
                                     </div>
                                 </div>
@@ -565,7 +566,7 @@ const JobTrackerPage = () => {
                                             type="date"
                                             value={dateApplied}
                                             onChange={e => setDateApplied(e.target.value)}
-                                            className="w-full bg-[#1c1d22]/50 border border-white/5 rounded-xl pl-11 pr-4 py-3 text-[0.85rem] text-white/80 focus:outline-none focus:border-primary/45 transition-all [color-scheme:dark]"
+                                            className="w-full bg-[#121316] border border-white/5 rounded-xl pl-11 pr-4 py-3 text-[0.85rem] text-white focus:outline-none focus:border-primary/45 transition-all [color-scheme:dark]"
                                         />
                                     </div>
                                 </div>
@@ -576,7 +577,7 @@ const JobTrackerPage = () => {
                                 <button
                                     type="button"
                                     onClick={() => setModalDropdownOpen(!modalDropdownOpen)}
-                                    className="w-full bg-[#1c1d22]/50 border border-white/5 rounded-xl px-4 py-3 text-[0.85rem] text-white/80 focus:outline-none focus:border-primary/45 text-left flex items-center justify-between gap-2"
+                                    className="w-full bg-[#121316] border border-white/5 rounded-xl px-4 py-3 text-[0.85rem] text-white focus:outline-none focus:border-primary/45 text-left flex items-center justify-between gap-2"
                                 >
                                     <span className="flex items-center gap-2.5">
                                         <span className={`w-2 h-2 rounded-full ${stages.find(s => s.key === appStage)?.dot}`} />
@@ -614,7 +615,7 @@ const JobTrackerPage = () => {
                                     onChange={e => setNotes(e.target.value)}
                                     placeholder="Salary expectations, referral details, or specific interests..."
                                     rows="4"
-                                    className="w-full bg-[#1c1d22]/50 border border-white/5 rounded-lg px-4 py-3 text-[0.85rem] text-white/80 placeholder:text-white/20 focus:outline-none focus:border-primary/45 transition-all resize-none"
+                                    className="w-full bg-[#121316] border border-white/5 rounded-lg px-4 py-3 text-[0.85rem] text-white placeholder:text-white/40 focus:outline-none focus:border-primary/45 transition-all resize-none"
                                 />
                             </div>
 
@@ -641,11 +642,11 @@ const JobTrackerPage = () => {
                         </form>
                     </div>
                 </div>
-            )}
+            , document.body)}
 
             {/* ── Details Side Drawer ── */}
-            {selectedApp && (
-                <div className="fixed inset-0 z-50 flex justify-end">
+            {selectedApp && createPortal(
+                <div className="fixed inset-0 z-[9999] flex justify-end">
                     {/* Backdrop */}
                     <div
                         onClick={() => setSelectedApp(null)}
@@ -912,7 +913,7 @@ const JobTrackerPage = () => {
 
                     </div>
                 </div>
-            )}
+            , document.body)}
 
         </div>
     );

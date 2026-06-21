@@ -76,20 +76,20 @@ const StageCard = ({ stage, stageIndex, roadmapColor, onSkillToggle }) => {
                     </h3>
                 </div>
                 
-                <div className="flex items-center gap-4 text-sm bg-white/5 rounded-xl px-4 py-2 border border-white/5">
+                <div className="flex justify-between sm:justify-start items-center gap-2 sm:gap-4 text-sm bg-white/5 rounded-xl px-3 sm:px-4 py-2.5 border border-white/5 w-full md:w-auto">
                     <div className="flex flex-col">
-                        <span className="text-white/40 text-[0.65rem] uppercase tracking-wider font-bold">Duration</span>
-                        <span className="text-white/90 font-medium">{mockTime}</span>
+                        <span className="text-white/40 text-[0.55rem] sm:text-[0.65rem] uppercase tracking-wider font-bold">Duration</span>
+                        <span className="text-white/90 font-medium text-[0.75rem] sm:text-sm">{mockTime}</span>
                     </div>
                     <div className="w-px h-6 bg-white/10" />
                     <div className="flex flex-col">
-                        <span className="text-white/40 text-[0.65rem] uppercase tracking-wider font-bold">Difficulty</span>
-                        <span className="text-white/90 font-medium">{stage.level || 'Intermediate'}</span>
+                        <span className="text-white/40 text-[0.55rem] sm:text-[0.65rem] uppercase tracking-wider font-bold">Difficulty</span>
+                        <span className="text-white/90 font-medium text-[0.75rem] sm:text-sm">{stage.level || 'Intermediate'}</span>
                     </div>
                     <div className="w-px h-6 bg-white/10" />
                     <div className="flex flex-col">
-                        <span className="text-white/40 text-[0.65rem] uppercase tracking-wider font-bold">Completion</span>
-                        <span className="text-violet-400 font-bold">{progress}%</span>
+                        <span className="text-white/40 text-[0.55rem] sm:text-[0.65rem] uppercase tracking-wider font-bold">Completion</span>
+                        <span className="text-violet-400 font-bold text-[0.75rem] sm:text-sm">{progress}%</span>
                     </div>
                 </div>
             </div>

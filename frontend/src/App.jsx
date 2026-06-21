@@ -17,6 +17,7 @@ import JobTrackerPage from './pages/JobTrackerPage';
 import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import SettingsPage from './pages/SettingsPage';
 
 const App = () => {
   return (
@@ -40,7 +41,7 @@ const App = () => {
           
           {/* Catch-all redirect to Dashboard if the path is unknown but within authenticated layout bounds (mock implementation) */}
           <Route path="job-tracker" element={<JobTrackerPage />} />
-          <Route path="settings" element={<Navigate to="/dashboard" replace />} />
+          <Route path="settings" element={<SettingsPage />} />
           <Route path="support" element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Routes>

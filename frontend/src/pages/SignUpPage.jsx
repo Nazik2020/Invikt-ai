@@ -34,8 +34,8 @@ const SignUpPage = () => {
     const leftContent = (
         <div className="flex flex-col h-full">
             <div>
-                <Link to="/" className="inline-block mb-16">
-                    <img src={logo} alt="Invikt" className="h-12 md:h-14 w-auto object-contain" />
+                <Link to="/" className="inline-block mb-8 -ml-2">
+                    <img src={logo} alt="Invikt" className="h-9 md:h-11 w-auto object-contain" />
                 </Link>
                 <div className="max-w-lg">
             <h1 className="text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] tracking-tight mb-8">
@@ -58,7 +58,7 @@ const SignUpPage = () => {
             </div>
             </div>
             <div className="text-[0.65rem] tracking-[0.2em] font-black text-white/30 uppercase mt-auto pt-12">
-                © 2024 INVIKT. CONQUER YOUR CAREER.
+                © 2026 INVIKT. CONQUER YOUR CAREER.
             </div>
         </div>
     );
