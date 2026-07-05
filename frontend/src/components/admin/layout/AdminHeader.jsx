@@ -38,18 +38,11 @@ const AdminHeader = ({ toggleSidebar }) => {
           <span className="material-symbols-outlined text-[20px]">menu</span>
         </button>
 
-        <div className="hidden md:flex items-center gap-2 text-[#00daf3]">
-          <div className="w-8 h-8 rounded-lg bg-[#00daf3]/10 flex items-center justify-center border border-[#00daf3]/20">
-            <span className="material-symbols-outlined text-[18px]">widgets</span>
-          </div>
-          <span className="font-headline font-bold text-sm tracking-wide text-[#00daf3]">
-            Invikt Admin
-          </span>
-        </div>
+
 
         {/* Dynamic Route Tabs */}
         {isUsersPage ? (
-          <nav className="hidden md:flex items-center gap-8 h-full ml-4">
+          <nav className="hidden md:flex items-center gap-8 h-full">
             <Link to="/admin/users" className="h-full flex items-center text-[11px] font-black uppercase tracking-widest text-[#00daf3] border-b-2 border-[#00daf3]">
               Users
             </Link>
@@ -61,7 +54,7 @@ const AdminHeader = ({ toggleSidebar }) => {
             </Link>
           </nav>
         ) : (
-          <div className="hidden sm:flex items-center gap-3 bg-slate-50 dark:bg-[#1a1c23] border border-slate-200 dark:border-white/5 rounded-xl px-4 py-2 w-80 md:w-96 focus-within:border-[#00daf3]/50 transition-all duration-300 ml-4">
+          <div className="hidden sm:flex items-center gap-3 bg-slate-50 dark:bg-[#1a1c23] border border-slate-200 dark:border-white/5 rounded-xl px-4 py-2 w-80 md:w-96 focus-within:border-[#00daf3]/50 transition-all duration-300">
             <span className="material-symbols-outlined text-slate-400 text-[18px]">
               search
             </span>

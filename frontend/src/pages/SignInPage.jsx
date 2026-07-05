@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../layouts/AuthLayout";
 import logo from "../assets/bg_removed_logo.png";
 
@@ -41,6 +41,22 @@ const GitHubIcon = () => (
 
 const SignInPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("admin@gmail.com");
+  const [password, setPassword] = useState("admin123");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const handleSignIn = (e) => {
+    e.preventDefault();
+    setError("");
+    if (email === "admin@gmail.com" && password === "admin123") {
+      navigate("/admin/dashboard");
+    } else if (email && password) {
+      navigate("/dashboard");
+    } else {
+      setError("Please enter your email and password.");
+    }
+  };
 
   const leftContent = (
     <div className="flex flex-col h-full">
@@ -140,8 +156,8 @@ const SignInPage = () => {
   return (
     <AuthLayout leftContent={leftContent}>
       <div className="w-full">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
+        <div className="text-center mb-6">
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-1.5 tracking-tight">
             Sign in to Invikt
           </h2>
           <p className="text-sm text-slate-500 dark:text-white/50">
@@ -149,7 +165,7 @@ const SignInPage = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-2 gap-4 mb-6">
           <button className="flex items-center justify-center py-3 px-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:bg-white/10 transition-colors text-sm font-semibold text-slate-900 dark:text-white">
             <GoogleIcon />
             Google
@@ -160,7 +176,7 @@ const SignInPage = () => {
           </button>
         </div>
 
-        <div className="relative flex items-center mb-8">
+        <div className="relative flex items-center mb-6">
           <div className="flex-grow border-t border-slate-200 dark:border-white/5"></div>
           <span className="flex-shrink-0 mx-4 text-[10px] uppercase tracking-widest font-black text-slate-400 dark:text-white/30">
             Or continue with email
@@ -168,16 +184,17 @@ const SignInPage = () => {
           <div className="flex-grow border-t border-slate-200 dark:border-white/5"></div>
         </div>
 
-        <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+        <form className="space-y-4" onSubmit={handleSignIn}>
           <div className="space-y-1.5">
             <label className="text-[11px] uppercase tracking-wider font-bold text-slate-600 dark:text-white/60">
               Email Address
             </label>
             <input
               type="email"
-              defaultValue="admin@gmail.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="name@company.com"
-              className="w-full bg-slate-50 dark:bg-[#1c1d22]/50 border border-slate-200 dark:border-white/5 rounded-xl px-4 py-3 text-[14px] text-slate-900 dark:text-white placeholder:text-slate-400 dark:text-white/20 focus:outline-none focus:border-primary/45 transition-all"
+              className="w-full bg-slate-50 dark:bg-[#1c1d22]/50 border border-slate-200 dark:border-white/5 rounded-xl px-4 py-3 text-[14px] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-primary/45 transition-all"
             />
           </div>
 
@@ -196,9 +213,10 @@ const SignInPage = () => {
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                defaultValue="admin123"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-slate-50 dark:bg-[#1c1d22]/50 border border-slate-200 dark:border-white/5 rounded-xl px-4 py-3 text-[14px] text-slate-900 dark:text-white placeholder:text-slate-400 dark:text-white/20 focus:outline-none focus:border-primary/45 transition-all font-mono"
+                className="w-full bg-slate-50 dark:bg-[#1c1d22]/50 border border-slate-200 dark:border-white/5 rounded-xl px-4 py-3 text-[14px] text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-primary/45 transition-all font-mono"
               />
               <button
                 type="button"
@@ -212,9 +230,13 @@ const SignInPage = () => {
             </div>
           </div>
 
+          {error && (
+            <p className="text-xs text-red-500 font-medium">{error}</p>
+          )}
+
           <button
             type="submit"
-            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#814df3] to-[#5d21df] text-white font-bold text-sm hover:shadow-[0_0_20px_rgba(93,33,223,0.4)] transition-all mt-4"
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#814df3] to-[#5d21df] text-white font-bold text-sm hover:shadow-[0_0_20px_rgba(93,33,223,0.4)] transition-all mt-2"
           >
             Sign In
           </button>

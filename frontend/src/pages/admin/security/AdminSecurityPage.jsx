@@ -1,109 +1,68 @@
 import React from "react";
+import SecurityStatusBanner from "./components/SecurityStatusBanner";
+import SecurityStatsCards   from "./components/SecurityStatsCards";
+import FailedLoginTable     from "./components/FailedLoginTable";
+import BlockedIPsList       from "./components/BlockedIPsList";
+import ActiveSessionsList   from "./components/ActiveSessionsList";
+import AdminActionsLog      from "./components/AdminActionsLog";
 
 const AdminSecurityPage = () => {
-  const auditLogs = [
-    {
-      id: "log1",
-      event: "User Login Success",
-      details: "Admin Nazik Al-Fayed (nazik@skilio.ai) logged in successfully.",
-      ip: "192.168.1.45",
-      time: "2 mins ago",
-      type: "info",
-    },
-    {
-      id: "log2",
-      event: "Roadmap Published",
-      details: "Template 'System Architecture' was updated and published.",
-      ip: "192.168.1.45",
-      time: "1 hour ago",
-      type: "info",
-    },
-    {
-      id: "log3",
-      event: "Subscription Upgraded",
-      details: "User Alex Sterling promoted to PRO subscription plan.",
-      ip: "10.0.4.12",
-      time: "4 hours ago",
-      type: "success",
-    },
-    {
-      id: "log4",
-      event: "Blocked Login Attempt",
-      details: "Suspended user Ron Tyson (rt99@mail.com) tried login. Request rejected.",
-      ip: "45.12.89.200",
-      time: "1 day ago",
-      type: "warning",
-    },
-    {
-      id: "log5",
-      event: "API Key Generated",
-      details: "Internal API Gateway system token regenerated.",
-      ip: "127.0.0.1",
-      time: "3 days ago",
-      type: "danger",
-    },
-  ];
+  const handleDownloadReport = () => {
+    // Future: trigger real download
+    alert("Generating security report…");
+  };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold font-headline text-slate-800 dark:text-white mb-2 tracking-tight">
-          Security & Audit Logs
-        </h1>
-        <p className="text-[14px] text-slate-500 dark:text-slate-400">
-          Monitor system actions, security exceptions, and configuration change history.
-        </p>
+    <div className="space-y-6 min-h-full bg-[#0f1117] dark:bg-[#0f1117] -m-6 md:-m-8 p-6 md:p-8">
+
+      {/* ── Page Header ── */}
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-headline font-bold text-white tracking-tight">
+            Security Center
+          </h1>
+          <p className="text-[13px] text-white/40 mt-1">
+            Monitor threats, manage sessions, and protect your platform.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3 shrink-0">
+          <button
+            onClick={handleDownloadReport}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/8 hover:bg-white/10 text-white/70 hover:text-white text-[12px] font-semibold transition-all"
+          >
+            <span className="material-symbols-outlined text-[16px]">download</span>
+            <span className="hidden sm:block">Download Security Report</span>
+            <span className="sm:hidden">Report</span>
+          </button>
+          <button className="relative w-10 h-10 flex items-center justify-center bg-white/5 border border-white/8 hover:bg-white/10 rounded-xl text-white/50 hover:text-white transition-all">
+            <span className="material-symbols-outlined text-[20px]">notifications</span>
+            <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-red-500"></span>
+          </button>
+        </div>
       </div>
 
-      {/* Audit Log Box */}
-      <div className="bg-white dark:bg-[#101216] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm">
-        <h3 className="font-headline text-sm font-bold text-slate-800 dark:text-white mb-6">
-          Recent System Events
-        </h3>
+      {/* ── Status Banner ── */}
+      <SecurityStatusBanner />
 
-        <div className="space-y-6">
-          {auditLogs.map((log) => (
-            <div
-              key={log.id}
-              className="flex items-start gap-4 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/[0.01] transition-all"
-            >
-              <div className="shrink-0 mt-0.5">
-                <span
-                  className={`material-symbols-outlined text-lg ${
-                    log.type === "success"
-                      ? "text-emerald-500"
-                      : log.type === "warning"
-                      ? "text-amber-500"
-                      : log.type === "danger"
-                      ? "text-red-500"
-                      : "text-blue-500"
-                  }`}
-                >
-                  {log.type === "warning" || log.type === "danger"
-                    ? "warning"
-                    : "info"}
-                </span>
-              </div>
+      {/* ── Stats Cards ── */}
+      <SecurityStatsCards />
 
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                  <div className="text-xs font-bold text-slate-800 dark:text-white">
-                    {log.event}
-                  </div>
-                  <div className="text-[10px] text-slate-400 font-medium">
-                    {log.time}
-                  </div>
-                </div>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                  {log.details}
-                </p>
-                <div className="text-[9px] text-slate-400 dark:text-white/20 font-mono mt-1">
-                  IP Address: {log.ip}
-                </div>
-              </div>
-            </div>
-          ))}
+      {/* ── Main Content Grid ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        {/* Left Column (7 cols) */}
+        <div className="lg:col-span-7 space-y-6">
+          <FailedLoginTable />
+          <BlockedIPsList />
         </div>
+
+        {/* Right Column (5 cols) */}
+        <div className="lg:col-span-5 space-y-6">
+          <ActiveSessionsList />
+          <AdminActionsLog />
+        </div>
+
       </div>
     </div>
   );

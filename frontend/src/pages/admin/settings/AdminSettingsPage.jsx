@@ -1,102 +1,88 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import SettingsSidebar from "../../../components/admin/settings/SettingsSidebar";
+import GeneralSettings from "../../../components/admin/settings/GeneralSettings";
+import FeatureFlags from "../../../components/admin/settings/FeatureFlags";
+import LimitsQuotas from "../../../components/admin/settings/LimitsQuotas";
+import AdminAccounts from "../../../components/admin/settings/AdminAccounts";
+import DangerZone from "../../../components/admin/settings/DangerZone";
 
 const AdminSettingsPage = () => {
-  const [name, setName] = useState("Nazik Al-Fayed");
-  const [email, setEmail] = useState("nazik@skilio.ai");
-  const [role] = useState("Lead Administrator");
-  const [isSaved, setIsSaved] = useState(false);
+  const [activeSection, setActiveSection] = useState("general");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsSaved(true);
-    setTimeout(() => setIsSaved(false), 2000);
+  const scrollToSection = (id) => {
+    setActiveSection(id);
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
+  // Optional: IntersectionObserver could be added here to auto-update activeSection on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = ["general", "features", "email", "limits", "admins", "danger"];
+      for (const id of sections) {
+        const element = document.getElementById(id);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          // If the section is roughly at the top of the viewport
+          if (rect.top >= 0 && rect.top <= 200) {
+            setActiveSection(id);
+            break;
+          }
+        }
+      }
+    };
+    
+    // Using a scroll listener on the main content area (which is the parent in the layout)
+    const mainArea = document.querySelector("main");
+    if (mainArea) {
+      mainArea.parentElement.addEventListener("scroll", handleScroll);
+      return () => mainArea.parentElement.removeEventListener("scroll", handleScroll);
+    }
+  }, []);
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold font-headline text-slate-800 dark:text-white mb-2 tracking-tight">
-          Admin Settings
-        </h1>
-        <p className="text-[14px] text-slate-500 dark:text-slate-400">
-          Update profile settings and configuration keys.
-        </p>
+    <div className="min-h-full bg-[#0f1117] dark:bg-[#0f1117] -m-6 md:-m-8 p-6 md:p-8 relative">
+      
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-headline font-bold text-[#00daf3] tracking-tight">
+            Platform Settings
+          </h1>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column Settings Form */}
-        <div className="lg:col-span-2 bg-white dark:bg-[#101216] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm">
-          <h3 className="font-headline text-sm font-bold text-slate-800 dark:text-white mb-6">
-            Administrator Profile
-          </h3>
+      {/* Layout Grid: Sidebar + Content */}
+      <div className="flex flex-col lg:flex-row gap-10">
+        
+        {/* Left Sticky Sidebar */}
+        <SettingsSidebar 
+          activeSection={activeSection} 
+          onSectionClick={scrollToSection} 
+        />
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-wider font-bold text-slate-500 dark:text-white/40">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-[#1c1d22]/50 border border-slate-200 dark:border-white/5 rounded-xl px-4 py-2.5 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-violet-500/50"
-                />
-              </div>
+        {/* Right Scrollable Content */}
+        <div className="flex-1 space-y-16 max-w-4xl pb-32">
+          <GeneralSettings />
+          <FeatureFlags />
+          
+          {/* Email placeholder if needed to match sidebar */}
+          <section id="email" className="scroll-mt-24 space-y-6">
+             <div>
+                <h2 className="text-2xl font-headline font-bold text-white tracking-tight">
+                  Email Configuration
+                </h2>
+                <p className="text-[12px] text-white/40 mt-1">Configure SMTP settings (Coming Soon)</p>
+             </div>
+          </section>
 
-              <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-wider font-bold text-slate-500 dark:text-white/40">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-[#1c1d22]/50 border border-slate-200 dark:border-white/5 rounded-xl px-4 py-2.5 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-violet-500/50"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-[10px] uppercase tracking-wider font-bold text-slate-500 dark:text-white/40">
-                Security Role (Read Only)
-              </label>
-              <input
-                type="text"
-                value={role}
-                disabled
-                className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 text-slate-500 dark:text-white/30 rounded-xl px-4 py-2.5 text-xs cursor-not-allowed"
-              />
-            </div>
-
-            <div className="flex items-center gap-4 pt-4">
-              <button
-                type="submit"
-                className="bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition-all"
-              >
-                Save Profile
-              </button>
-              {isSaved && (
-                <span className="text-xs text-emerald-500 font-bold flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[16px]">
-                    check_circle
-                  </span>
-                  Changes saved successfully!
-                </span>
-              )}
-            </div>
-          </form>
+          <LimitsQuotas />
+          <AdminAccounts />
+          <DangerZone />
         </div>
 
-        {/* Right Info Box */}
-        <div className="bg-white dark:bg-[#101216] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm h-fit">
-          <h3 className="font-headline text-sm font-bold text-slate-800 dark:text-white mb-4">
-            Internal Config
-          </h3>
-          <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-            This administration portal manages core content assets of Skilio AI. Be careful when updating roadmaps, suspending members, or changing health metrics.
-          </p>
-        </div>
       </div>
     </div>
   );

@@ -1,165 +1,330 @@
 import React, { useState } from "react";
+import RoadmapCard from "./components/RoadmapCard";
+import RoadmapEditModal from "./components/RoadmapEditModal";
+
+const ROADMAPS_DATA = [
+  {
+    id: "rm1",
+    title: "Frontend Architect",
+    icon: "html",
+    skills: 12,
+    stages: 4,
+    enrolled: 384,
+    completion: 72,
+    accentColor: "#00daf3",
+    completionColor: "#00ffcc",
+    category: "Engineering",
+    duration: "6",
+    description:
+      "Master the art of building immersive web interfaces. This comprehensive guide covers everything from semantic HTML and modern CSS layouts to advanced JavaScript ecosystems and performance optimization. Designed for architects who build the future of the web.",
+  },
+  {
+    id: "rm2",
+    title: "Data Scientist",
+    icon: "storage",
+    skills: 18,
+    stages: 5,
+    enrolled: 512,
+    completion: 65,
+    accentColor: "#a78bfa",
+    completionColor: "#c4b5fd",
+    category: "Data Science",
+    duration: "8",
+    description:
+      "Dive deep into data analysis, machine learning pipelines, statistical modeling, and visualization tools used by top-tier data teams worldwide.",
+  },
+  {
+    id: "rm3",
+    title: "AI Systems Engineer",
+    icon: "psychology",
+    skills: 24,
+    stages: 6,
+    enrolled: 920,
+    completion: 48,
+    accentColor: "#8b5cf6",
+    completionColor: "#a78bfa",
+    category: "Engineering",
+    duration: "10",
+    description:
+      "Build scalable AI systems from scratch. From transformer architectures to MLOps pipelines, this roadmap targets engineers who deploy production-grade AI.",
+  },
+  {
+    id: "rm4",
+    title: "Product Designer",
+    icon: "brush",
+    skills: 10,
+    stages: 3,
+    enrolled: 256,
+    completion: 84,
+    accentColor: "#f59e0b",
+    completionColor: "#fbbf24",
+    category: "Design",
+    duration: "5",
+    description:
+      "Learn the end-to-end product design process — from user research and wireframing to high-fidelity prototyping and design systems.",
+  },
+  {
+    id: "rm5",
+    title: "Cloud Architect",
+    icon: "cloud",
+    skills: 15,
+    stages: 4,
+    enrolled: 412,
+    completion: 78,
+    accentColor: "#00daf3",
+    completionColor: "#67e8f9",
+    category: "DevOps",
+    duration: "7",
+    description:
+      "Master AWS, GCP, and Azure architectures. Design resilient, scalable cloud solutions with a focus on cost efficiency and security.",
+  },
+  {
+    id: "rm6",
+    title: "Cybersecurity Specialist",
+    icon: "security",
+    skills: 20,
+    stages: 5,
+    enrolled: 295,
+    completion: 55,
+    accentColor: "#ef4444",
+    completionColor: "#f87171",
+    category: "Cybersecurity",
+    duration: "9",
+    description:
+      "Develop expertise in ethical hacking, network defense, penetration testing, and threat intelligence for enterprise-grade security operations.",
+  },
+  {
+    id: "rm7",
+    title: "Blockchain Developer",
+    icon: "hub",
+    skills: 14,
+    stages: 4,
+    enrolled: 182,
+    completion: 61,
+    accentColor: "#00daf3",
+    completionColor: "#22d3ee",
+    category: "Blockchain",
+    duration: "7",
+    description:
+      "Build smart contracts, dApps, and DeFi protocols on Ethereum and beyond. Covers Solidity, Web3.js, and blockchain architecture patterns.",
+  },
+  {
+    id: "rm8",
+    title: "ML Operations",
+    icon: "model_training",
+    skills: 22,
+    stages: 6,
+    enrolled: 445,
+    completion: 42,
+    accentColor: "#a78bfa",
+    completionColor: "#818cf8",
+    category: "Data Science",
+    duration: "9",
+    description:
+      "Bridge the gap between data science and engineering. Learn CI/CD for ML, experiment tracking, model monitoring, and serving infrastructure.",
+  },
+  {
+    id: "rm9",
+    title: "Backend Systems",
+    icon: "terminal",
+    skills: 16,
+    stages: 4,
+    enrolled: 628,
+    completion: 79,
+    accentColor: "#10b981",
+    completionColor: "#34d399",
+    category: "Engineering",
+    duration: "6",
+    description:
+      "Build high-performance APIs, distributed systems, and microservice architectures using Node.js, Go, and PostgreSQL.",
+  },
+];
 
 const AdminRoadmapsPage = () => {
-  const [roadmaps, setRoadmaps] = useState([
-    {
-      id: "rm1",
-      title: "Frontend Master",
-      category: "Software Development",
-      steps: 8,
-      popularity: "High",
-      status: "Published",
-    },
-    {
-      id: "rm2",
-      title: "System Architecture",
-      category: "Engineering",
-      steps: 12,
-      popularity: "Medium",
-      status: "Published",
-    },
-    {
-      id: "rm3",
-      title: "Cloud Infrastructure",
-      category: "DevOps",
-      steps: 10,
-      popularity: "Medium",
-      status: "Draft",
-    },
-    {
-      id: "rm4",
-      title: "Database Design",
-      category: "Data Science",
-      steps: 6,
-      popularity: "Low",
-      status: "Published",
-    },
-  ]);
+  const [roadmaps, setRoadmaps] = useState(ROADMAPS_DATA);
+  const [editingRoadmap, setEditingRoadmap] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
 
-  const [newTitle, setNewTitle] = useState("");
-  const [newCategory, setNewCategory] = useState("Software Development");
+  const totalEnrollments = roadmaps.reduce((sum, r) => sum + r.enrolled, 0);
+  const avgCompletion = Math.round(
+    roadmaps.reduce((sum, r) => sum + r.completion, 0) / roadmaps.length
+  );
+  const fullCompletions = 312;
 
-  const addRoadmap = (e) => {
-    e.preventDefault();
-    if (!newTitle.trim()) return;
+  const filteredRoadmaps = roadmaps.filter((r) =>
+    r.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-    const newRM = {
-      id: `rm${roadmaps.length + 1}`,
-      title: newTitle,
-      category: newCategory,
-      steps: 5,
-      popularity: "Low",
-      status: "Draft",
-    };
-
-    setRoadmaps((prev) => [newRM, ...prev]);
-    setNewTitle("");
+  const handleSave = (updated) => {
+    setRoadmaps((prev) =>
+      prev.map((r) => (r.id === updated.id ? updated : r))
+    );
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold font-headline text-slate-800 dark:text-white mb-2 tracking-tight">
-          Roadmaps
-        </h1>
-        <p className="text-[14px] text-slate-500 dark:text-slate-400">
-          Design, edit, and publish master career roadmaps.
-        </p>
+    <div className="space-y-6 min-h-full bg-[#0f1117] dark:bg-[#0f1117] -m-6 md:-m-8 p-6 md:p-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl md:text-2xl font-bold font-headline text-white">
+            Roadmap Management
+          </h1>
+        </div>
+        <div className="flex items-center gap-3">
+          {/* Search */}
+          <div className="flex items-center gap-2 bg-white/5 border border-white/8 rounded-xl px-3 py-2 flex-1 sm:flex-none sm:w-52">
+            <span className="material-symbols-outlined text-white/30 text-[16px]">search</span>
+            <input
+              type="text"
+              placeholder="Search roadmaps..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="bg-transparent border-none outline-none text-white/80 text-xs placeholder:text-white/20 w-full"
+            />
+          </div>
+          {/* Bell */}
+          <button className="w-9 h-9 flex items-center justify-center bg-white/5 border border-white/8 rounded-xl text-white/40 hover:text-white transition-colors">
+            <span className="material-symbols-outlined text-[18px]">notifications</span>
+          </button>
+          {/* Help */}
+          <button className="w-9 h-9 flex items-center justify-center bg-white/5 border border-white/8 rounded-xl text-white/40 hover:text-white transition-colors">
+            <span className="material-symbols-outlined text-[18px]">help_outline</span>
+          </button>
+          {/* Add Roadmap CTA */}
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-2 bg-gradient-to-r from-[#814df3] to-[#5d21df] hover:opacity-90 text-white text-xs font-black px-4 py-2.5 rounded-xl shadow-[0_4px_15px_rgba(93,33,223,0.35)] transition-all shrink-0"
+          >
+            <span className="material-symbols-outlined text-[16px]">add</span>
+            <span className="hidden sm:block">Add New Roadmap</span>
+            <span className="sm:hidden">Add</span>
+          </button>
+        </div>
       </div>
 
-      {/* Grid configuration */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Form: Create Roadmap Template */}
-        <div className="bg-white dark:bg-[#101216] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm h-fit">
-          <h3 className="font-headline text-sm font-bold text-slate-800 dark:text-white mb-4">
-            New Template
-          </h3>
-          <form onSubmit={addRoadmap} className="space-y-4">
-            <div className="space-y-1">
-              <label className="text-[10px] uppercase tracking-wider font-bold text-slate-500 dark:text-white/40">
-                Roadmap Title
-              </label>
-              <input
-                type="text"
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-                placeholder="e.g. Machine Learning Specialist"
-                className="w-full bg-slate-50 dark:bg-[#1c1d22]/50 border border-slate-200 dark:border-white/5 rounded-xl px-4 py-2.5 text-xs text-slate-800 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-violet-500/50"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-[10px] uppercase tracking-wider font-bold text-slate-500 dark:text-white/40">
-                Category
-              </label>
-              <select
-                value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-[#1c1d22]/50 border border-slate-200 dark:border-white/5 rounded-xl px-4 py-2.5 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-violet-500/50"
-              >
-                <option value="Software Development">Software Development</option>
-                <option value="Engineering">Engineering</option>
-                <option value="DevOps">DevOps</option>
-                <option value="Data Science">Data Science</option>
-              </select>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-gradient-to-br from-[#814df3] to-[#5d21df] text-white py-2.5 rounded-xl text-xs font-bold shadow-[0_4px_12px_rgba(93,33,223,0.3)] hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-            >
-              <span className="material-symbols-outlined text-[16px]">add</span>
-              Create Draft Template
-            </button>
-          </form>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total Roadmaps */}
+        <div className="bg-[#1a1c23] border border-white/5 rounded-2xl p-5">
+          <p className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-3">
+            TOTAL ROADMAPS
+          </p>
+          <div className="flex items-end gap-2">
+            <span className="text-2xl font-headline font-black text-white">
+              {roadmaps.length}
+            </span>
+            <span className="text-[11px] font-bold text-[#00daf3] mb-0.5">
+              +2 this month
+            </span>
+          </div>
         </div>
 
-        {/* Right Templates List */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="bg-white dark:bg-[#101216] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm">
-            <h3 className="font-headline text-sm font-bold text-slate-800 dark:text-white mb-6">
-              Active Templates
-            </h3>
+        {/* Total Enrollments */}
+        <div className="bg-[#1a1c23] border border-white/5 rounded-2xl p-5">
+          <p className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-3">
+            TOTAL ENROLLMENTS
+          </p>
+          <div className="flex items-end gap-2">
+            <span className="text-2xl font-headline font-black text-[#00daf3]">
+              {totalEnrollments.toLocaleString()}
+            </span>
+            <span className="text-[11px] font-bold text-[#00daf3] mb-0.5 flex items-center gap-0.5">
+              <span className="material-symbols-outlined text-[12px]">arrow_upward</span>
+              12%
+            </span>
+          </div>
+        </div>
 
-            <div className="divide-y divide-slate-100 dark:divide-white/5">
-              {roadmaps.map((rm) => (
+        {/* Avg Completion */}
+        <div className="bg-[#1a1c23] border border-white/5 rounded-2xl p-5">
+          <p className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-3">
+            AVG COMPLETION RATE
+          </p>
+          <div className="flex items-end gap-3">
+            <span className="text-2xl font-headline font-black text-white">
+              {avgCompletion}%
+            </span>
+            <div className="flex-1 mb-1.5">
+              <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
                 <div
-                  key={rm.id}
-                  className="py-4 flex items-center justify-between gap-4 first:pt-0 last:pb-0"
-                >
-                  <div>
-                    <div className="text-xs font-bold text-slate-800 dark:text-white">
-                      {rm.title}
-                    </div>
-                    <div className="flex items-center gap-3 text-[10px] text-slate-500 dark:text-white/40 mt-1">
-                      <span>{rm.category}</span>
-                      <span>•</span>
-                      <span>{rm.steps} steps</span>
-                    </div>
-                  </div>
+                  className="h-full bg-gradient-to-r from-[#00daf3] to-[#814df3] rounded-full"
+                  style={{ width: `${avgCompletion}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
 
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span
-                      className={`text-[8px] font-bold px-1.5 py-0.5 rounded tracking-wide uppercase ${
-                        rm.status === "Published"
-                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                          : "bg-slate-100 text-slate-500 dark:bg-white/10 dark:text-white/30"
-                      }`}
-                    >
-                      {rm.status}
-                    </span>
-                    <button className="p-1 rounded hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors">
-                      <span className="material-symbols-outlined text-[16px]">
-                        edit
-                      </span>
-                    </button>
-                  </div>
-                </div>
-              ))}
+        {/* Full Completions */}
+        <div className="bg-[#1a1c23] border border-white/5 rounded-2xl p-5">
+          <p className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-3">
+            FULL COMPLETIONS
+          </p>
+          <div className="flex items-center justify-between">
+            <span className="text-2xl font-headline font-black text-white">
+              {fullCompletions}
+            </span>
+            <div className="w-10 h-10 rounded-full bg-violet-500/10 flex items-center justify-center border border-violet-500/20">
+              <span className="material-symbols-outlined text-violet-400 text-[20px]">
+                workspace_premium
+              </span>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Roadmap Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+        {filteredRoadmaps.length > 0 ? (
+          filteredRoadmaps.map((roadmap) => (
+            <RoadmapCard
+              key={roadmap.id}
+              roadmap={roadmap}
+              onEdit={(rm) => setEditingRoadmap(rm)}
+            />
+          ))
+        ) : (
+          <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
+            <span className="material-symbols-outlined text-[48px] text-white/10 mb-3">route</span>
+            <p className="text-white/30 text-sm">No roadmaps matching "{searchTerm}"</p>
+          </div>
+        )}
+      </div>
+
+      {/* Edit Modal */}
+      {editingRoadmap && (
+        <RoadmapEditModal
+          roadmap={editingRoadmap}
+          onClose={() => setEditingRoadmap(null)}
+          onSave={handleSave}
+        />
+      )}
+
+      {/* Add Roadmap Modal (reuse edit with blank data) */}
+      {showAddModal && (
+        <RoadmapEditModal
+          roadmap={{
+            id: `rm${Date.now()}`,
+            title: "New Roadmap",
+            icon: "route",
+            skills: 0,
+            stages: 0,
+            enrolled: 0,
+            completion: 0,
+            accentColor: "#814df3",
+            completionColor: "#a78bfa",
+            category: "Engineering",
+            duration: "6",
+            description: "",
+          }}
+          onClose={() => setShowAddModal(false)}
+          onSave={(newRM) => {
+            setRoadmaps((prev) => [newRM, ...prev]);
+            setShowAddModal(false);
+          }}
+        />
+      )}
     </div>
   );
 };

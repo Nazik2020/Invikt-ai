@@ -25,6 +25,7 @@ import AdminDashboardPage from "./pages/admin/overview/AdminDashboardPage";
 import AdminUsersPage from "./pages/admin/users/AdminUsersPage";
 import AdminRoadmapsPage from "./pages/admin/roadmaps/AdminRoadmapsPage";
 import AdminSecurityPage from "./pages/admin/security/AdminSecurityPage";
+import AdminApplicationsPage from "./pages/admin/applications/AdminApplicationsPage";
 import AdminSettingsPage from "./pages/admin/settings/AdminSettingsPage";
 
 const App = () => {
@@ -61,6 +62,7 @@ const App = () => {
           <Route path="dashboard" element={<AdminDashboardPage />} />
           <Route path="users" element={<AdminUsersPage />} />
           <Route path="roadmaps" element={<AdminRoadmapsPage />} />
+          <Route path="applications" element={<AdminApplicationsPage />} />
           <Route path="security" element={<AdminSecurityPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
         </Route>

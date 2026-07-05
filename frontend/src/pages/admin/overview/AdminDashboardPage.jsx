@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const AdminDashboardPage = () => {
   const [healthChecking, setHealthChecking] = useState(false);
@@ -468,10 +469,13 @@ const AdminDashboardPage = () => {
 
           <div className="space-y-3 flex-grow flex flex-col justify-center">
             {/* Primary Brand Action Button */}
-            <button className="w-full bg-gradient-to-br from-[#814df3] to-[#5d21df] text-white py-3 px-4 rounded-xl text-xs font-bold shadow-[0_4px_15px_rgba(93,33,223,0.35)] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-between">
+            <Link
+              to="/admin/roadmaps"
+              className="w-full bg-gradient-to-br from-[#814df3] to-[#5d21df] text-white py-3 px-4 rounded-xl text-xs font-bold shadow-[0_4px_15px_rgba(93,33,223,0.35)] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-between"
+            >
               <span>Add New Roadmap</span>
               <span className="material-symbols-outlined text-sm">add</span>
-            </button>
+            </Link>
 
             {/* Megaphone bordered Action Button */}
             <button className="w-full border border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 bg-slate-50 dark:bg-[#16171d]/60 text-slate-800 dark:text-white py-3 px-4 rounded-xl text-xs font-bold hover:bg-slate-100 dark:hover:bg-[#16171d] transition-all flex items-center justify-between">

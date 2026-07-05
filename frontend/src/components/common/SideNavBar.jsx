@@ -23,10 +23,15 @@ const v1Nav = [
     icon: "work_history",
     description: "Kanban application board",
   },
+  {
+    name: "Resume Analyzer",
+    path: "/resume",
+    icon: "description",
+    description: "AI resume breakdown",
+  },
 ];
 
 const v2Nav = [
-  { name: "Resume Analyzer", icon: "description" },
   { name: "Skill Gap", icon: "query_stats" },
   { name: "Learning Hub", icon: "school" },
 ];
@@ -105,7 +110,7 @@ const SideNavBar = () => {
               Core
             </p>
           )}
-          <nav className="flex flex-col gap-0.5 px-2">
+          <nav className="flex flex-col gap-1 px-3">
             {v1Nav.map((item) => (
               <NavLink
                 key={item.name}
@@ -171,7 +176,7 @@ const SideNavBar = () => {
               </span>
             </div>
           )}
-          <div className="flex flex-col gap-0.5 px-2">
+          <div className="flex flex-col gap-1 px-3">
             {v2Nav.map((item) => (
               <div
                 key={item.name}
