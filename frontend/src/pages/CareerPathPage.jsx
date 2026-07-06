@@ -3,7 +3,7 @@ import RoadmapGrid from "../components/career/RoadmapGrid";
 
 const CareerPathPage = () => {
   return (
-    <div className="w-full space-y-10">
+    <div className="w-full max-w-7xl mx-auto space-y-10">
       {/* ── Page Header ── */}
       <div className="space-y-1">
         <h1 className="font-headline text-3xl md:text-4xl font-bold text-slate-900 dark:text-white/90 tracking-tight">

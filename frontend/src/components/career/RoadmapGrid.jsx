@@ -9,7 +9,7 @@ const RoadmapCard = ({ roadmap }) => {
 
   return (
     <div
-      className="group relative flex flex-col rounded-2xl border border-slate-200 dark:border-white/5 overflow-hidden cursor-pointer
+      className="group relative flex flex-col h-full rounded-2xl border border-slate-200 dark:border-white/5 overflow-hidden cursor-pointer
                        bg-white dark:bg-[#1e1f23] hover:bg-slate-50 dark:bg-[#24252a] hover:border-slate-200 dark:border-white/10 transition-all duration-300
                        hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]"
       onClick={() => navigate(`/career-path/${roadmap.id}`)}
@@ -135,15 +135,19 @@ const CategoryTabs = ({ selected, onChange }) => (
 // ─── Main Export ─────────────────────────────────────────────────────────────
 const RoadmapGrid = () => {
   const [search, setSearch] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
   const [activeCategory, setActiveCategory] = useState("all");
+  const navigate = useNavigate();
 
   const filtered = useMemo(() => {
     return roadmaps.filter((r) => {
       const matchCat =
         activeCategory === "all" || r.category === activeCategory;
+      const s = search.toLowerCase();
       const matchSearch =
-        r.title.toLowerCase().includes(search.toLowerCase()) ||
-        r.description.toLowerCase().includes(search.toLowerCase());
+        r.title.toLowerCase().includes(s) ||
+        r.description.toLowerCase().includes(s) ||
+        (r.seo?.keywords && r.seo.keywords.some((k) => k.toLowerCase().includes(s)));
       return matchCat && matchSearch;
     });
   }, [search, activeCategory]);
@@ -162,18 +166,66 @@ const RoadmapGrid = () => {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setTimeout(() => setIsFocused(false), 200)}
           placeholder="Search roadmaps, skills, or roles..."
-          className="w-full bg-white dark:bg-[#1e1f23] border border-slate-200 dark:border-white/8 rounded-xl pl-11 pr-4 py-3 text-[0.9rem]
+          className="w-full bg-white dark:bg-[#1e1f23] border border-slate-200 dark:border-white/8 rounded-xl pl-11 pr-11 py-3 text-[0.9rem]
                                text-slate-700 dark:text-white/80 placeholder:text-slate-400 dark:text-white/25 focus:outline-none focus:border-primary/40
-                               focus:bg-slate-50 dark:bg-[#24252a] transition-all"
+                               focus:bg-slate-50 dark:bg-[#24252a] transition-all relative z-20"
         />
         {search && (
           <button
             onClick={() => setSearch("")}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/30 hover:text-slate-600 dark:text-white/60 transition-colors"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/30 hover:text-slate-600 dark:text-white/60 transition-colors z-20"
           >
             <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
+        )}
+
+        {/* Auto-suggest Dropdown */}
+        {search && isFocused && (
+          <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white/90 dark:bg-[#15161a]/95 backdrop-blur-xl border border-slate-200/60 dark:border-white/10 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.5)] overflow-hidden z-30 animate-in fade-in slide-in-from-top-2">
+            {filtered.length > 0 ? (
+              <ul className="max-h-72 overflow-y-auto p-2">
+                {filtered.map((r) => (
+                  <li key={`sugg-${r.id}`}>
+                    <button
+                      onClick={() => navigate(`/career-path/${r.id}`)}
+                      className="group w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all duration-200 flex items-center gap-4"
+                    >
+                      <div
+                        className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                        style={{ background: `${r.accent || '#888'}18` }}
+                      >
+                        <span
+                          className="material-symbols-outlined text-[20px]"
+                          style={{ color: r.accent || 'currentColor', fontVariationSettings: "'FILL' 1" }}
+                        >
+                          {r.icon}
+                        </span>
+                      </div>
+                      <div className="flex flex-col flex-1 min-w-0">
+                        <span className="text-[0.95rem] font-semibold text-slate-800 dark:text-white/90 truncate transition-colors">
+                          {r.title}
+                        </span>
+                        <span className="text-[0.75rem] text-slate-500 dark:text-white/40 truncate">
+                          {r.stageCount} Stages • {r.skillCount} Skills
+                        </span>
+                      </div>
+                      <span className="material-symbols-outlined text-slate-300 dark:text-white/20 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
+                        arrow_forward
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="px-6 py-8 text-center flex flex-col items-center gap-2">
+                <span className="material-symbols-outlined text-3xl text-slate-300 dark:text-white/20">search_off</span>
+                <span className="text-[0.9rem] text-slate-500 dark:text-white/40 font-medium">No matches found for "{search}"</span>
+              </div>
+            )}
+          </div>
         )}
       </div>
 

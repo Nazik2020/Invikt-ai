@@ -4,7 +4,7 @@ import { roadmaps } from "../../data/roadmaps";
 
 const SkillRow = ({ skill, onToggle }) => {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-start justify-between py-3 border-b border-slate-200 dark:border-white/5 last:border-0 gap-3">
+    <div className="flex flex-col py-3 border-b border-slate-200 dark:border-white/5 last:border-0 gap-3">
       <div className="flex items-start gap-3 flex-1 min-w-0">
         <button
           onClick={() => onToggle(skill.id)}
@@ -43,7 +43,7 @@ const SkillRow = ({ skill, onToggle }) => {
         </div>
       </div>
       {skill.resources?.length > 0 && (
-        <div className="flex flex-wrap gap-2 pl-8 sm:pl-0 shrink-0">
+        <div className="flex flex-wrap gap-2 pl-8 shrink-0">
           {skill.resources.map((res, idx) => {
             let url, name, type;
             if (typeof res === "string") {
@@ -244,7 +244,7 @@ const RoadmapDetail = () => {
   }
 
   return (
-    <div className="w-full max-w-[1500px] mx-auto space-y-10 pb-20">
+    <div className="w-full max-w-7xl mx-auto space-y-10 pb-20">
       {/* Back button */}
       <button
         onClick={() => navigate("/career-path")}
@@ -307,6 +307,17 @@ const RoadmapDetail = () => {
               onSkillToggle={handleSkillToggle}
             />
           ))}
+
+          {/* Paid Resources Disclaimer */}
+          <div className="mt-10 p-5 rounded-xl border border-violet-500/20 bg-violet-500/5 flex gap-4 items-start">
+            <span className="material-symbols-outlined text-violet-400 mt-0.5">info</span>
+            <div>
+              <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-1">Looking for Paid Certificates?</h4>
+              <p className="text-[0.8rem] text-slate-600 dark:text-white/60 leading-relaxed">
+                The resources curated in this roadmap are highly vetted, free materials to ensure education is accessible to everyone. If you need formal, university-backed certificates for your resume, we highly recommend searching for these exact topic names on platforms like <strong className="text-slate-800 dark:text-white/90">Coursera</strong> or <strong className="text-slate-800 dark:text-white/90">Udemy</strong>.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Right: Analytics / Readiness Widget */}

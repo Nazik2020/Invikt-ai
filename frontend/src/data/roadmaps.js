@@ -2,6 +2,13 @@
 // Central data source for all career roadmap definitions
 import { aiEngineerRoadmap } from "./roadmaps/ai-engineer";
 import { aiDataScientistRoadmap } from "./roadmaps/ai-data-scientist";
+import { cyberSecurityRoadmap } from "./roadmaps/cyber-security";
+import { fullStackRoadmap } from "./roadmaps/full-stack";
+import { qaEngineerRoadmap } from "./roadmaps/qa-engineer";
+import { frontendRoadmap } from "./roadmaps/frontend";
+import { devopsRoadmap } from "./roadmaps/devops";
+import { androidRoadmap } from "./roadmaps/android";
+import { blockchainRoadmap } from "./roadmaps/blockchain";
 
 export const categories = [
   { id: "all", label: "All" },
@@ -16,4 +23,11 @@ export const categories = [
 export const roadmaps = [
   aiEngineerRoadmap,
   aiDataScientistRoadmap,
+  cyberSecurityRoadmap,
+  fullStackRoadmap,
+  qaEngineerRoadmap,
+  frontendRoadmap,
+  devopsRoadmap,
+  androidRoadmap,
+  blockchainRoadmap
 ];
