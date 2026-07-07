@@ -5,26 +5,110 @@
   display: none;
 }
 
-.react-flow__controls-button {
+/* Wrapper Backgrounds */
+.flow-light {
+  background-color: #f9fafb;
+}
+.flow-dark {
+  background-color: #0b0f19; /* very dark blue/black */
+}
+
+/* React Flow controls adapt to mode */
+.flow-light .react-flow__controls-button {
   background: #ffffff;
   border: 1px solid #e5e7eb;
   color: #374151;
 }
-
-.react-flow__controls-button:hover {
-  background: #faf5ff;
+.flow-light .react-flow__controls-button:hover {
+  background: #f3f4f6;
+}
+.flow-dark .react-flow__controls-button {
+  background: #1f2937;
+  border: 1px solid #374151;
+  color: #f3f4f6;
+}
+.flow-dark .react-flow__controls-button:hover {
+  background: #374151;
 }
 
 .react-flow__minimap-mask {
-  fill: rgba(124, 58, 237, 0.05);
+  fill: rgba(245, 197, 24, 0.1);
 }
 
 .react-flow__edge-path {
-  stroke: #c4b5fd;
+  stroke: #9ca3af;
   stroke-width: 1.5;
 }
 
 .react-flow__edge.selected .react-flow__edge-path {
-  stroke: #7c3aed;
+  stroke: #f5c518;
   stroke-width: 2;
+}
+
+/* Custom Node Styles */
+.stage-node {
+  background: #f5c518;
+  border: 2px solid #111827;
+  border-radius: 8px;
+  padding: 12px 24px;
+  width: 250px;
+  text-align: center;
+  box-shadow: 4px 4px 0px #111827;
+  font-weight: 800;
+  color: #111827;
+  text-transform: uppercase;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  font-family: 'Manrope', sans-serif;
+}
+
+/* Default / Light Mode Skill Node */
+.skill-node {
+  border-radius: 6px;
+  padding: 10px 16px;
+  width: 180px;
+  text-align: center;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.flow-light .skill-node {
+  background: #ffffff;
+  border: 2px solid #374151;
+  color: #111827;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.flow-light .skill-node.advanced {
+  background: #dbeafe;
+}
+.flow-light .skill-node.optional {
+  background: #f0fdf4;
+  border-style: dashed;
+}
+
+/* Dark Mode Skill Node */
+.flow-dark .skill-node {
+  background: #1f2937;
+  border: 2px solid #4b5563;
+  color: #f9fafb;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+.flow-dark .skill-node.advanced {
+  background: #1e3a8a;
+  border-color: #3b82f6;
+}
+.flow-dark .skill-node.optional {
+  background: #064e3b;
+  border-color: #10b981;
+  border-style: dashed;
+}
+
+/* Hover States */
+.skill-node:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(245, 197, 24, 0.3) !important;
+  border-color: #f5c518 !important;
 }

@@ -8,9 +8,20 @@ const RESOURCE_ICONS = {
 const NodeSidebar = ({ node, onClose, onMarkLearned, isLearned }) => {
   if (!node) return null;
 
-  const resources = node.resources || {};
-  const hasResources = Object.values(resources)
-    .some(arr => arr && arr.length > 0);
+  let normalizedResources = {};
+  
+  if (Array.isArray(node.resources)) {
+    normalizedResources = {
+      youtube: node.resources.filter(r => r.type === 'YouTube' || (r.url && (r.url.includes('youtube.com') || r.url.includes('youtu.be')))),
+      courses: node.resources.filter(r => r.type === 'Course' || r.type === 'Courses' || (r.url && r.url.includes('coursera'))),
+      docs: node.resources.filter(r => r.type === 'Docs' || r.type === 'Article' || r.type === 'Book' || r.type === 'Paper' || (r.url && r.url.includes('docs'))),
+      practice: node.resources.filter(r => r.type === 'Practice' || r.type === 'GitHub' || r.type === 'OpenSource'),
+    };
+  } else {
+    normalizedResources = node.resources || {};
+  }
+
+  const hasResources = Object.values(normalizedResources).some(arr => arr && arr.length > 0);
 
   return (
     <>
@@ -127,7 +138,7 @@ const NodeSidebar = ({ node, onClose, onMarkLearned, isLearned }) => {
         <div style={{ padding: '24px', flex: 1 }}>
           {hasResources ? (
             Object.entries(RESOURCE_ICONS).map(([key, icon]) => {
-              const items = resources[key] || [];
+              const items = normalizedResources[key] || [];
               if (items.length === 0) return null;
 
               return (
@@ -177,7 +188,7 @@ const NodeSidebar = ({ node, onClose, onMarkLearned, isLearned }) => {
                         color: '#7c3aed',
                         marginBottom: '2px',
                       }}>
-                        {item.title}
+                        {item.title || item.name}
                       </div>
                       {(item.channel || item.platform) && (
                         <div style={{

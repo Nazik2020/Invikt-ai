@@ -3,325 +3,198 @@ import {
   ReactFlow,
   Background,
   Controls,
+  ControlButton,
   MiniMap,
   useNodesState,
   useEdgesState,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import RoadmapNode from './RoadmapNode';
+import { StageNode, SkillNode } from './RoadmapNode';
 import NodeSidebar from './NodeSidebar';
 import './roadmapDiagram.css';
 
 // Register custom node types
 const nodeTypes = {
-  roadmapNode: RoadmapNode,
+  stageNode: StageNode,
+  skillNode: SkillNode,
 };
 
-// Edge style — the connecting lines
-const defaultEdgeOptions = {
-  style: {
-    stroke: '#c4b5fd',
-    strokeWidth: 1.5,
-  },
-  type: 'smoothstep',
-  animated: false,
-};
-
-const RoadmapDiagram = ({ roadmapData }) => {
+const RoadmapDiagram = ({ roadmapData, onSkillToggle }) => {
   const [selectedNode, setSelectedNode] = useState(null);
-  const [learnedNodes, setLearnedNodes] = useState(new Set());
+  const [isLightMode, setIsLightMode] = useState(false);
 
-  // Convert roadmap JSON into React Flow nodes
+  // Compute learned nodes from shared roadmap state
+  const learnedNodes = useMemo(() => {
+    const learned = new Set();
+    if (roadmapData && roadmapData.stages) {
+      roadmapData.stages.forEach(stage => {
+        if (stage.skills) {
+          stage.skills.forEach(skill => {
+            if (skill.done) learned.add(skill.id);
+          });
+        }
+      });
+    }
+    return learned;
+  }, [roadmapData]);
+
+  // Convert roadmap JSON into React Flow nodes using hierarchical vertical layout
   const buildNodes = useCallback(() => {
     const nodes = [];
+    const edges = [];
     let yOffset = 0;
+    const centerX = 3000; // Large center to avoid negative coords
 
     roadmapData.stages.forEach((stage, stageIndex) => {
-      const stageX = 400;
+      const stageId = `stage-${stage.id}`;
 
-      // Stage label node (the purple section header)
+      // Stage Node (Yellow Box)
       nodes.push({
-        id: `stage-${stage.id}`,
-        type: 'roadmapNode',
-        position: { x: stageX, y: yOffset },
+        id: stageId,
+        type: 'stageNode',
+        position: { x: centerX - 125, y: yOffset }, // 250px width -> -125 to center
         data: {
           label: `Stage ${stage.number || stageIndex + 1} — ${stage.title}`,
-          type: 'section',
+          stage: stage,
         },
         draggable: false,
       });
 
-      yOffset += 70;
-
-      // Skill nodes for this stage
-      if (stage.skills) {
-        stage.skills.forEach((skill, skillIndex) => {
-          const isEven = skillIndex % 2 === 0;
-          const xPos = isEven ? stageX - 180 : stageX + 180;
-
-          nodes.push({
-            id: skill.id,
-            type: 'roadmapNode',
-            position: {
-              x: xPos,
-              y: yOffset + skillIndex * 80
-            },
-            data: {
-              label: skill.name,
-              type: skill.level === 'Beginner'
-                ? 'subtopic'
-                : skill.level === 'Advanced'
-                ? 'required'
-                : 'subtopic',
-              level: skill.level,
-              description: skill.description,
-              estimated_hours: skill.estimated_hours,
-              resources: skill.resources,
-              onClick: (data) => setSelectedNode(data),
-            },
-            draggable: false,
-          });
-        });
-
-        yOffset += stage.skills.length * 80 + 60;
-      }
-    });
-
-    return nodes;
-  }, [roadmapData]);
-
-  // Build connecting edges between nodes
-  const buildEdges = useCallback(() => {
-    const edges = [];
-
-    roadmapData.stages.forEach((stage, stageIndex) => {
-      // Connect stage header to first skill
-      if (stage.skills && stage.skills.length > 0) {
+      // Yellow Dashed Edge to Next Stage
+      if (stageIndex < roadmapData.stages.length - 1) {
+        const nextStageId = `stage-${roadmapData.stages[stageIndex + 1].id}`;
         edges.push({
-          id: `e-stage-${stage.id}-first`,
-          source: `stage-${stage.id}`,
-          target: stage.skills[0].id,
-          ...defaultEdgeOptions,
+          id: `e-${stageId}-next`,
+          source: stageId,
+          target: nextStageId,
+          sourceHandle: 'left',
+          targetHandle: 'left',
+          type: 'step',
+          animated: true,
+          style: { stroke: '#f5c518', strokeWidth: 3, strokeDasharray: '6 4' },
         });
+      }
 
-        // Connect skills within stage sequentially
-        stage.skills.forEach((skill, skillIndex) => {
-          if (skillIndex < stage.skills.length - 1) {
-            edges.push({
-              id: `e-${skill.id}-${stage.skills[skillIndex + 1].id}`,
-              source: skill.id,
-              target: stage.skills[skillIndex + 1].id,
-              ...defaultEdgeOptions,
+      yOffset += 130;
+
+      // Skill Nodes (White Boxes spread horizontally)
+      if (stage.skills && stage.skills.length > 0) {
+        const nodeWidth = 180;
+        const gap = 20;
+        const maxPerRow = 6;
+        const rows = Math.ceil(stage.skills.length / maxPerRow);
+
+        for (let r = 0; r < rows; r++) {
+          const skillsInRow = stage.skills.slice(r * maxPerRow, (r + 1) * maxPerRow);
+          const totalWidth = skillsInRow.length * nodeWidth + (skillsInRow.length - 1) * gap;
+          let startX = centerX - totalWidth / 2;
+
+          skillsInRow.forEach((skill) => {
+            nodes.push({
+              id: skill.id,
+              type: 'skillNode',
+              position: { x: startX, y: yOffset },
+              data: {
+                label: skill.name,
+                level: skill.level || 'Beginner',
+                description: skill.description,
+                estimated_hours: skill.estimated_hours,
+                resources: skill.resources,
+                onClick: (data) => setSelectedNode(data),
+              },
+              draggable: false,
             });
-          }
-        });
 
-        // Connect last skill of stage to next stage header
-        if (
-          stageIndex < roadmapData.stages.length - 1 &&
-          roadmapData.stages[stageIndex + 1].skills && 
-          roadmapData.stages[stageIndex + 1].skills.length > 0
-        ) {
-          const lastSkill = stage.skills[stage.skills.length - 1];
-          const nextStage = roadmapData.stages[stageIndex + 1];
-          edges.push({
-            id: `e-${lastSkill.id}-stage-${nextStage.id}`,
-            source: lastSkill.id,
-            target: `stage-${nextStage.id}`,
-            style: {
-              stroke: '#7c3aed',
-              strokeWidth: 2,
-              strokeDasharray: '6 3',
-            },
-            type: 'smoothstep',
+            // Smooth branch edge from stage bottom to skill top
+            edges.push({
+              id: `e-${stageId}-${skill.id}`,
+              source: stageId,
+              target: skill.id,
+              sourceHandle: 'bottom',
+              targetHandle: 'top',
+              type: 'smoothstep',
+              style: { stroke: '#9ca3af', strokeWidth: 1.5 },
+            });
+
+            startX += nodeWidth + gap;
           });
+
+          yOffset += 110; // offset for next row of skills
         }
       }
+
+      yOffset += 60; // Extra gap before next stage
     });
 
-    return edges;
+    return { nodes, edges };
   }, [roadmapData]);
 
-  const initialNodes = useMemo(() => buildNodes(), [buildNodes]);
-  const initialEdges = useMemo(() => buildEdges(), [buildEdges]);
+  const { nodes: initialNodes, edges: initialEdges } = useMemo(() => buildNodes(), [buildNodes]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   const handleMarkLearned = () => {
     if (!selectedNode) return;
-    setLearnedNodes(prev => {
-      const next = new Set(prev);
-      if (next.has(selectedNode.id || selectedNode.label)) {
-        next.delete(selectedNode.id || selectedNode.label);
-      } else {
-        next.add(selectedNode.id || selectedNode.label);
-      }
-      return next;
-    });
+    if (onSkillToggle) {
+      onSkillToggle(selectedNode.id);
+    }
   };
 
-  const totalSkills = roadmapData.stages.reduce(
-    (acc, s) => acc + (s.skills ? s.skills.length : 0), 0
-  );
-
   return (
-    <div style={{ position: 'relative', width: '100%' }}>
-
-      {/* Progress Header */}
-      <div style={{
-        padding: '16px 24px',
-        background: '#faf5ff',
-        borderBottom: '1px solid #ede9fe',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-      }}>
-        <div>
-          <h2 style={{
-            margin: 0,
-            fontSize: '20px',
-            fontWeight: '800',
-            color: '#4c1d95',
-            fontFamily: 'Manrope, sans-serif',
-          }}>
-            {roadmapData.icon && <span className="material-symbols-outlined align-middle mr-2">{roadmapData.icon}</span>}
-            {roadmapData.title}
-          </h2>
-          <p style={{
-            margin: '4px 0 0',
-            fontSize: '12px',
-            color: '#7c3aed',
-          }}>
-            {roadmapData.stages_count || roadmapData.stages.length} stages •
-            {roadmapData.skills_count || totalSkills} skills •
-            ~{roadmapData.estimated_time || roadmapData.stats?.estimatedTime}
-          </p>
-        </div>
-
-        {/* Progress */}
-        <div style={{ textAlign: 'right' }}>
-          <div style={{
-            fontSize: '24px',
-            fontWeight: '800',
-            color: '#7c3aed',
-            fontFamily: 'Manrope, sans-serif',
-          }}>
-            {learnedNodes.size}/{totalSkills}
-          </div>
-          <div style={{
-            fontSize: '11px',
-            color: '#9ca3af',
-            marginBottom: '6px',
-          }}>
-            skills learned
-          </div>
-          <div style={{
-            width: '120px',
-            height: '6px',
-            background: '#ede9fe',
-            borderRadius: '3px',
-            overflow: 'hidden',
-          }}>
-            <div style={{
-              height: '100%',
-              borderRadius: '3px',
-              background: 'linear-gradient(90deg, #a78bfa, #7c3aed)',
-              width: `${totalSkills === 0 ? 0 : (learnedNodes.size / totalSkills) * 100}%`,
-              transition: 'width 0.4s ease',
-            }} />
-          </div>
-        </div>
-      </div>
-
-      {/* Legend */}
-      <div style={{
-        padding: '10px 24px',
-        background: '#ffffff',
-        borderBottom: '1px solid #f3f4f6',
-        display: 'flex',
-        gap: '20px',
-        alignItems: 'center',
-      }}>
-        <span style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600' }}>
-          LEGEND:
-        </span>
-        {[
-          { color: '#7c3aed', bg: '#f5f0ff', label: 'Stage Header' },
-          { color: '#374151', bg: '#ffffff', border: '#ddd6fe', label: 'Skill (click to learn)' },
-          { color: '#92400e', bg: '#fef3c7', border: '#f59e0b', label: 'Advanced Skill' },
-          { color: '#166534', bg: '#f0fdf4', border: '#22c55e', label: 'Optional Skill' },
-        ].map((item, i) => (
-          <div key={i} style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-          }}>
-            <div style={{
-              width: '14px',
-              height: '14px',
-              borderRadius: '3px',
-              background: item.bg,
-              border: `1.5px solid ${item.border || item.color}`,
-            }} />
-            <span style={{
-              fontSize: '11px',
-              color: '#6b7280',
-            }}>
-              {item.label}
-            </span>
-          </div>
-        ))}
-        <span style={{
-          marginLeft: 'auto',
-          fontSize: '11px',
-          color: '#9ca3af',
-        }}>
-          💡 Click any skill node to see resources
-        </span>
-      </div>
-
+    <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 64px)' }} className={isLightMode ? 'flow-light' : 'flow-dark'}>
       {/* React Flow Diagram */}
-      <div style={{ height: '80vh', background: '#fefefe' }}>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          nodeTypes={nodeTypes}
-          fitView
-          fitViewOptions={{ padding: 0.3 }}
-          minZoom={0.3}
-          maxZoom={2}
-          attributionPosition="bottom-left"
+      <ReactFlow
+        colorMode={isLightMode ? 'light' : 'dark'}
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        nodeTypes={nodeTypes}
+        fitView
+        fitViewOptions={{ padding: 0.2 }}
+        minZoom={0.2}
+        maxZoom={2}
+        attributionPosition="bottom-left"
+      >
+        <Background
+          color="#e5e7eb"
+          gap={20}
+          size={1}
+          variant="dots"
+        />
+        <Controls
+          style={{
+            background: isLightMode ? '#ffffff' : '#1f2937',
+            border: `1px solid ${isLightMode ? '#e5e7eb' : '#374151'}`,
+            borderRadius: '8px',
+          }}
         >
-          <Background
-            color="#e5e7eb"
-            gap={20}
-            size={1}
-            variant="dots"
-          />
-          <Controls
-            style={{
-              background: '#ffffff',
-              border: '1px solid #e5e7eb',
-              borderRadius: '8px',
-            }}
-          />
-          <MiniMap
-            nodeColor={node => {
-              if (node.data?.type === 'section') return '#7c3aed';
-              if (learnedNodes.has(node.id)) return '#22c55e';
-              return '#ddd6fe';
-            }}
-            style={{
-              background: '#faf5ff',
-              border: '1px solid #ede9fe',
-              borderRadius: '8px',
-            }}
-          />
-        </ReactFlow>
-      </div>
+          <ControlButton 
+            onClick={() => setIsLightMode(!isLightMode)}
+            title="Toggle Light/Dark Mode"
+          >
+            <span 
+              className="material-symbols-outlined" 
+              style={{ fontSize: '16px', color: isLightMode ? '#374151' : '#f3f4f6' }}
+            >
+              {isLightMode ? 'dark_mode' : 'light_mode'}
+            </span>
+          </ControlButton>
+        </Controls>
+        <MiniMap
+          nodeColor={node => {
+            if (node.type === 'stageNode') return '#f5c518';
+            if (learnedNodes.has(node.id)) return '#22c55e';
+            return isLightMode ? '#e5e7eb' : '#374151';
+          }}
+          style={{
+            background: isLightMode ? '#ffffff' : '#1f2937',
+            border: `1px solid ${isLightMode ? '#e5e7eb' : '#374151'}`,
+            borderRadius: '8px',
+          }}
+        />
+      </ReactFlow>
 
       {/* Node Click Sidebar */}
       {selectedNode && (
