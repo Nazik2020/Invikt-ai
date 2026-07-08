@@ -3,6 +3,8 @@ import { NavLink, Link } from "react-router-dom";
 import logo from "../../assets/bg_removed_logo.png";
 import logoIcon from "../../assets/bg_removed_logo_only.png";
 import { useSidebar } from "../../context/SidebarContext";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const v1Nav = [
   {
@@ -38,6 +40,18 @@ const v2Nav = [
 
 const SideNavBar = () => {
   const { isCollapsed, toggle } = useSidebar();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
+  const rawUsername = user?.username || "User";
+  const username = rawUsername.charAt(0).toUpperCase() + rawUsername.slice(1);
+  const email = user?.email || "hello@invikt.com";
+  const initial = username.charAt(0).toUpperCase();
 
   return (
     <aside
@@ -250,24 +264,24 @@ const SideNavBar = () => {
                 settings
               </span>
             </NavLink>
-            <NavLink
-              to="/support"
-              title="Help"
-              className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 dark:text-white/40 hover:bg-slate-100 dark:bg-white/5 hover:text-slate-700 dark:text-white/80 transition-all"
+            <button
+              onClick={handleLogout}
+              title="Log out"
+              className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 dark:text-white/40 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400 transition-all"
             >
               <span
                 className="material-symbols-outlined text-[20px]"
                 style={{ fontVariationSettings: "'FILL' 0, 'wght' 300" }}
               >
-                help
+                logout
               </span>
-            </NavLink>
+            </button>
             <div
-              title="Nazik — hello@invikt.com"
+              title={`${username} — ${email}`}
               className="w-9 h-9 mt-1 rounded-full bg-gradient-to-br from-primary-container to-secondary-fixed-dim flex items-center justify-center cursor-pointer ring-2 ring-primary/20"
             >
               <span className="text-sm font-black text-slate-900 dark:text-white">
-                N
+                {initial}
               </span>
             </div>
           </div>
@@ -286,32 +300,32 @@ const SideNavBar = () => {
                 </span>
                 Settings
               </NavLink>
-              <NavLink
-                to="/support"
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-slate-500 dark:text-white/40 hover:bg-slate-100 dark:bg-white/5 hover:text-slate-700 dark:text-white/80 transition-all text-xs font-medium"
+              <button
+                onClick={handleLogout}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-slate-500 dark:text-white/40 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400 transition-all text-xs font-medium"
               >
                 <span
                   className="material-symbols-outlined text-[18px]"
                   style={{ fontVariationSettings: "'FILL' 0, 'wght' 300" }}
                 >
-                  help
+                  logout
                 </span>
-                Help
-              </NavLink>
+                Log out
+              </button>
             </div>
             <div className="px-3 pb-4 pt-1">
               <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:bg-white/5 cursor-pointer transition-all group">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-container to-secondary-fixed-dim flex items-center justify-center shrink-0 ring-2 ring-primary/20">
                   <span className="text-xs font-black text-slate-900 dark:text-white">
-                    N
+                    {initial}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[0.85rem] font-semibold text-slate-700 dark:text-white/80 truncate leading-tight">
-                    Nazik
+                    {username}
                   </p>
                   <p className="text-[0.65rem] text-slate-400 dark:text-white/30 truncate">
-                    hello@invikt.com
+                    {email}
                   </p>
                 </div>
                 <span className="material-symbols-outlined text-[18px] text-slate-400 dark:text-white/25 group-hover:text-slate-500 dark:text-white/50 transition-colors">

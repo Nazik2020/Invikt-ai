@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 // Layouts
 import PublicLayout from "./layouts/PublicLayout";
 import DashboardLayout from "./layouts/DashboardLayout";
+import ProtectedRoute from "./components/common/ProtectedRoute";
 
 // Pages
 import LandingPage from "./pages/LandingPage";
@@ -40,31 +41,35 @@ const App = () => {
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/forgot-password" element={<ResetPasswordPage />} />
 
-        {/* Regular User Dashboard Routes */}
-        <Route path="/" element={<DashboardLayout />}>
-          <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="resume" element={<ResumeAnalyzerPage />} />
-          <Route path="skill-gap" element={<SkillGapPage />} />
-          <Route path="career-path" element={<CareerPathPage />} />
-          <Route path="career-path/:id" element={<RoadmapDetail />} />
-          <Route path="learning-hub" element={<LearningHubPage />} />
-          <Route path="job-tracker" element={<JobTrackerPage />} />
-          <Route path="settings" element={<SettingsPage />} />
-          <Route
-            path="support"
-            element={<Navigate to="/dashboard" replace />}
-          />
+        {/* Regular User Dashboard Routes (Protected) */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<DashboardLayout />}>
+            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="resume" element={<ResumeAnalyzerPage />} />
+            <Route path="skill-gap" element={<SkillGapPage />} />
+            <Route path="career-path" element={<CareerPathPage />} />
+            <Route path="career-path/:id" element={<RoadmapDetail />} />
+            <Route path="learning-hub" element={<LearningHubPage />} />
+            <Route path="job-tracker" element={<JobTrackerPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route
+              path="support"
+              element={<Navigate to="/dashboard" replace />}
+            />
+          </Route>
         </Route>
 
-        {/* Admin Dashboard Routes */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Navigate to="/admin/dashboard" replace />} />
-          <Route path="dashboard" element={<AdminDashboardPage />} />
-          <Route path="users" element={<AdminUsersPage />} />
-          <Route path="roadmaps" element={<AdminRoadmapsPage />} />
-          <Route path="applications" element={<AdminApplicationsPage />} />
-          <Route path="security" element={<AdminSecurityPage />} />
-          <Route path="settings" element={<AdminSettingsPage />} />
+        {/* Admin Dashboard Routes (Protected) */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Navigate to="/admin/dashboard" replace />} />
+            <Route path="dashboard" element={<AdminDashboardPage />} />
+            <Route path="users" element={<AdminUsersPage />} />
+            <Route path="roadmaps" element={<AdminRoadmapsPage />} />
+            <Route path="applications" element={<AdminApplicationsPage />} />
+            <Route path="security" element={<AdminSecurityPage />} />
+            <Route path="settings" element={<AdminSettingsPage />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

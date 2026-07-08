@@ -1,8 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  const rawUsername = user?.username || "User";
+  const displayName = rawUsername.charAt(0).toUpperCase() + rawUsername.slice(1);
 
   // Mock data based on screenshot
   const metrics = [
@@ -120,7 +125,7 @@ const DashboardPage = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
         <div className="space-y-1">
           <h1 className="font-headline text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
-            Welcome back, Nazik <span className="animate-premium-wave">👋</span>
+            Welcome back, {displayName} <span className="animate-premium-wave">👋</span>
           </h1>
           <p className="text-slate-500 dark:text-white/40 text-sm md:text-base font-medium">
             Here's your career progress at a glance.

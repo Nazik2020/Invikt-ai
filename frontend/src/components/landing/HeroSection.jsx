@@ -15,7 +15,7 @@ const HeroSection = () => {
         </span>
       </div>
 
-      <h1 className="font-headline text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-extrabold tracking-tight mb-6 bg-gradient-to-b from-slate-900 to-slate-600 dark:from-white dark:to-white/60 bg-clip-text text-transparent max-w-4xl mx-auto leading-[1.1] px-2 md:px-0">
+      <h1 className="font-headline text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-extrabold tracking-tight mb-4 pb-2 bg-gradient-to-b from-slate-900 to-slate-600 dark:from-white dark:to-white/60 bg-clip-text text-transparent max-w-4xl mx-auto leading-[1.1] md:leading-[1.15] px-2 md:px-0">
         Your AI Career Intelligence Platform
       </h1>
 

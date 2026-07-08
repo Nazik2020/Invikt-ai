@@ -1,7 +1,11 @@
 import React, { useState } from "react";
+import { API_URL } from "../../../config/api";
+import { useAuth } from "../../../context/AuthContext";
 
 const TableView = ({ stages, filteredApps, setSelectedApp, apps, setApps }) => {
   const [selectedIds, setSelectedIds] = useState([]);
+  const [moveDropdownOpen, setMoveDropdownOpen] = useState(false);
+  const { getAuthHeaders } = useAuth();
 
   const toggleSelectAll = () => {
     if (selectedIds.length === filteredApps.length && filteredApps.length > 0) {
@@ -17,10 +21,54 @@ const TableView = ({ stages, filteredApps, setSelectedApp, apps, setApps }) => {
     );
   };
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = async () => {
     if (selectedIds.length === 0) return;
-    setApps((prev) => prev.filter((a) => !selectedIds.includes(a.id)));
-    setSelectedIds([]);
+
+    try {
+      // Create an array of promises for concurrent deletion
+      const deletePromises = selectedIds.map(id =>
+        fetch(`${API_URL}/jobs/${id}`, {
+          method: "DELETE",
+          headers: getAuthHeaders(),
+        })
+      );
+      
+      await Promise.all(deletePromises);
+      
+      // Update local state after successful deletion
+      setApps((prev) => prev.filter((a) => !selectedIds.includes(a.id)));
+      setSelectedIds([]);
+    } catch (error) {
+      console.error("Error deleting selected jobs:", error);
+    }
+  };
+
+  const handleBulkMove = async (newStage) => {
+    if (selectedIds.length === 0) return;
+    const stageObj = stages.find(s => s.key === newStage);
+
+    try {
+      const updatePromises = selectedIds.map(id =>
+        fetch(`${API_URL}/jobs/${id}`, {
+          method: "PUT",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ stage: newStage, badge: stageObj ? stageObj.name.toUpperCase() : "" }),
+        })
+      );
+      
+      await Promise.all(updatePromises);
+      
+      setApps((prev) => prev.map((a) => {
+        if (selectedIds.includes(a.id)) {
+          return { ...a, stage: newStage, badge: stageObj ? stageObj.name.toUpperCase() : a.badge };
+        }
+        return a;
+      }));
+      setSelectedIds([]);
+      setMoveDropdownOpen(false);
+    } catch (error) {
+      console.error("Error updating selected jobs:", error);
+    }
   };
 
   return (
@@ -41,10 +89,30 @@ const TableView = ({ stages, filteredApps, setSelectedApp, apps, setApps }) => {
               {selectedIds.length} applications selected
             </span>
           </div>
-          <div className="flex items-center gap-3 sm:w-auto w-full">
-            <button className="flex-1 sm:flex-none px-4 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white text-[0.8rem] font-bold transition-colors text-center">
+          <div className="flex items-center gap-3 sm:w-auto w-full relative">
+            <button 
+              onClick={() => setMoveDropdownOpen(!moveDropdownOpen)}
+              className="flex-1 sm:flex-none px-4 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white text-[0.8rem] font-bold transition-colors text-center flex items-center justify-center gap-2"
+            >
               Move to...
+              <span className="material-symbols-outlined text-[16px]">expand_more</span>
             </button>
+
+            {moveDropdownOpen && (
+              <div className="absolute top-full mt-2 left-0 w-48 bg-white dark:bg-[#141519] border border-slate-200 dark:border-white/10 rounded-xl p-1.5 shadow-xl z-50">
+                {stages.map((stage) => (
+                  <button
+                    key={stage.key}
+                    onClick={() => handleBulkMove(stage.key)}
+                    className="w-full text-left px-3 py-2 text-[0.8rem] text-slate-600 dark:text-white/70 hover:bg-slate-100 dark:bg-white/5 hover:text-slate-900 dark:text-white rounded-lg flex items-center gap-2 transition-colors"
+                  >
+                    <span className={`w-2 h-2 rounded-full ${stage.dot}`} />
+                    {stage.name}
+                  </button>
+                ))}
+              </div>
+            )}
+
             <button 
               onClick={handleDeleteSelected}
               className="flex-1 sm:flex-none px-4 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-[0.8rem] font-bold transition-colors text-center"
@@ -170,7 +238,7 @@ const TableView = ({ stages, filteredApps, setSelectedApp, apps, setApps }) => {
                   <td className="py-4 px-4 text-right">
                     <button
                       onClick={() => setSelectedApp(app)}
-                      className="text-slate-400 dark:text-white/20 hover:text-slate-600 dark:text-white/60 transition-colors"
+                      className="text-slate-400 dark:text-white/20 hover:text-slate-600 dark:text-white/60 transition-colors cursor-pointer"
                     >
                       <span className="material-symbols-outlined text-[20px]">more_vert</span>
                     </button>

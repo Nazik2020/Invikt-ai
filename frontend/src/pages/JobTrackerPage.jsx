@@ -2,6 +2,8 @@ import React, { useState, useMemo, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import KanbanBoard from "../components/dashboard/JobTracker/KanbanBoard";
 import TableView from "../components/dashboard/JobTracker/TableView";
+import { useAuth } from "../context/AuthContext";
+import { API_URL } from "../config/api";
 
 const stages = [
   {
@@ -175,17 +177,54 @@ const initialApps = [
 ];
 
 const JobTrackerPage = () => {
-  const [apps, setApps] = useState(initialApps);
+  const [apps, setApps] = useState([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [sortOrder, setSortOrder] = useState("DESC"); // DESC = Recent First, ASC = Oldest First
   const [viewMode, setViewMode] = useState("BOARD");
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedApp, setSelectedApp] = useState(null);
+  
+  // Custom Discard Modal State
+  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
+  
+  // Toast & UI States
+  const [toast, setToast] = useState({ show: false, message: "" });
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+
+  const showToast = (message) => {
+    setToast({ show: true, message });
+    setTimeout(() => setToast({ show: false, message: "" }), 3000);
+  };
+
+  const { getAuthHeaders } = useAuth();
+
+  // Fetch jobs from MongoDB backend
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const response = await fetch(`${API_URL}/jobs`, {
+          headers: getAuthHeaders(),
+        });
+        const json = await response.json();
+        if (json.success) {
+          const formatted = json.data.map(app => ({ ...app, id: app._id }));
+          setApps(formatted);
+        }
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+      }
+    };
+    fetchJobs();
+  }, []);
 
   // Form inputs state (Add Modal)
   const [companyName, setCompanyName] = useState("");
   const [jobTitle, setJobTitle] = useState("");
   const [jobUrl, setJobUrl] = useState("");
+  const [addLocation, setAddLocation] = useState("");
+  const [addEmployment, setAddEmployment] = useState("Full-time");
   const [dateApplied, setDateApplied] = useState("");
   const [appStage, setAppStage] = useState("APPLIED");
   const [notes, setNotes] = useState("");
@@ -257,7 +296,7 @@ const JobTrackerPage = () => {
   }, []);
 
   // Handle form submit (Add Modal)
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
     setTriedSubmit(true);
     if (!companyName.trim() || !jobTitle.trim()) return;
@@ -265,7 +304,6 @@ const JobTrackerPage = () => {
     const stageObj = stages.find((s) => s.key === appStage) || stages[1];
 
     const newApp = {
-      id: Date.now().toString(),
       company: companyName.trim(),
       role: jobTitle.trim(),
       stage: appStage,
@@ -273,73 +311,236 @@ const JobTrackerPage = () => {
       badge: stageObj.name.toUpperCase(),
       logoText: companyName.trim().slice(0, 2).toUpperCase(),
       logoColor: "bg-violet-500/10 text-violet-400",
-      location: "Remote",
-      employment: "Full-time",
+      location: addLocation.trim() || "Remote",
+      employment: addEmployment,
       jobUrl: jobUrl.trim(),
       dateApplied: dateApplied.trim() || new Date().toLocaleDateString(),
       notes: notes.trim(),
     };
 
-    setApps((prev) => [newApp, ...prev]);
-    setShowAddModal(false);
-    setTriedSubmit(false);
-
-    // Reset
-    setCompanyName("");
-    setJobTitle("");
-    setJobUrl("");
-    setDateApplied("");
-    setAppStage("APPLIED");
-    setNotes("");
+    try {
+      const response = await fetch(`${API_URL}/jobs`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(newApp),
+      });
+      const json = await response.json();
+      
+      if (json.success) {
+        const savedApp = { ...json.data, id: json.data._id };
+        setApps((prev) => [savedApp, ...prev]);
+        setShowAddModal(false);
+        setTriedSubmit(false);
+        setCompanyName("");
+        setJobTitle("");
+        setJobUrl("");
+        setAddLocation("");
+        setAddEmployment("Full-time");
+        setDateApplied("");
+        setAppStage("APPLIED");
+        setNotes("");
+        showToast("Job application saved successfully!");
+      }
+    } catch (error) {
+      console.error("Error saving job:", error);
+    }
   };
 
   // Handle save edit drawer changes
-  const handleSaveDrawer = () => {
+  const handleSaveDrawer = async () => {
     if (!editCompany.trim() || !editRole.trim()) return;
+    const stageObj = stages.find((s) => s.key === editStage) || stages[1];
 
-    setApps((prev) =>
-      prev.map((a) => {
-        if (a.id === selectedApp.id) {
-          const stageObj = stages.find((s) => s.key === editStage) || stages[1];
-          return {
-            ...a,
-            company: editCompany.trim(),
-            role: editRole.trim(),
-            stage: editStage,
-            badge: stageObj.name.toUpperCase(),
-            location: editLocation.trim(),
-            employment: editEmployment,
-            jobUrl: editJobUrl.trim(),
-            dateApplied: editDateApplied.trim(),
-            notes: editNotes.trim(),
-            logoText: editCompany.trim().slice(0, 2).toUpperCase(),
-          };
-        }
-        return a;
-      }),
-    );
-
-    // Update active selection to reflect updates
-    setSelectedApp((prev) => ({
-      ...prev,
+    const updateData = {
       company: editCompany.trim(),
       role: editRole.trim(),
       stage: editStage,
+      badge: stageObj.name.toUpperCase(),
       location: editLocation.trim(),
       employment: editEmployment,
       jobUrl: editJobUrl.trim(),
       dateApplied: editDateApplied.trim(),
       notes: editNotes.trim(),
-    }));
+      logoText: editCompany.trim().slice(0, 2).toUpperCase(),
+    };
 
-    setIsEditing(false);
+    try {
+      const response = await fetch(`${API_URL}/jobs/${selectedApp.id}`, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(updateData),
+      });
+      const json = await response.json();
+      
+      if (json.success) {
+        setApps((prev) =>
+          prev.map((a) => {
+            if (a.id === selectedApp.id) {
+              return { ...a, ...updateData };
+            }
+            return a;
+          }),
+        );
+
+        setSelectedApp((prev) => ({
+          ...prev,
+          ...updateData,
+        }));
+        setIsEditing(false);
+        showToast("Changes saved successfully!");
+      }
+    } catch (error) {
+      console.error("Error updating job:", error);
+    }
+  };
+
+  // Check if any fields were actually modified
+  const hasUnsavedChanges = useMemo(() => {
+    if (!selectedApp) return false;
+    return (
+      editCompany !== selectedApp.company ||
+      editRole !== selectedApp.role ||
+      editStage !== selectedApp.stage ||
+      editLocation !== (selectedApp.location || "") ||
+      editEmployment !== (selectedApp.employment || "Full-time") ||
+      editJobUrl !== (selectedApp.jobUrl || "") ||
+      editDateApplied !== (selectedApp.dateApplied || "") ||
+      editNotes !== (selectedApp.notes || "")
+    );
+  }, [selectedApp, editCompany, editRole, editStage, editLocation, editEmployment, editJobUrl, editDateApplied, editNotes]);
+
+  // Check if any fields were actually modified in Add Modal
+  const hasUnsavedAddChanges = useMemo(() => {
+    return (
+      companyName.trim() !== "" ||
+      jobTitle.trim() !== "" ||
+      jobUrl.trim() !== "" ||
+      notes.trim() !== "" ||
+      addLocation.trim() !== "" ||
+      addEmployment !== "Full-time"
+    );
+  }, [companyName, jobTitle, jobUrl, notes, addLocation, addEmployment]);
+
+  // Protect against accidental browser tab closures
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if ((isEditing && hasUnsavedChanges) || (showAddModal && hasUnsavedAddChanges)) {
+        e.preventDefault();
+        e.returnValue = ""; // Required for modern browsers to show the prompt
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isEditing, hasUnsavedChanges, showAddModal, hasUnsavedAddChanges]);
+
+  const handleCloseAddModal = () => {
+    if (hasUnsavedAddChanges) {
+      setPendingAction("close_add");
+      setShowDiscardConfirm(true);
+    } else {
+      setShowAddModal(false);
+      setTriedSubmit(false);
+      // Reset form
+      setCompanyName("");
+      setJobTitle("");
+      setJobUrl("");
+      setAppStage("APPLIED");
+      setAddLocation("");
+      setAddEmployment("Full-time");
+      setDateApplied("");
+      setNotes("");
+    }
+  };
+
+  const handleCloseDrawer = () => {
+    if (isEditing && hasUnsavedChanges) {
+      setPendingAction("close");
+      setShowDiscardConfirm(true);
+    } else {
+      setIsEditing(false);
+      setSelectedApp(null);
+    }
+  };
+
+  const handleToggleEdit = () => {
+    if (isEditing) {
+      if (hasUnsavedChanges) {
+        setPendingAction("cancel_edit");
+        setShowDiscardConfirm(true);
+      } else {
+        setIsEditing(false); // No changes, just cancel safely
+      }
+    } else {
+      setIsEditing(true);
+    }
+  };
+
+  const executeDiscard = () => {
+    if (pendingAction === "close") {
+      setIsEditing(false);
+      setSelectedApp(null);
+    } else if (pendingAction === "cancel_edit") {
+      setIsEditing(false);
+      // Reset states
+      setEditCompany(selectedApp.company);
+      setEditRole(selectedApp.role);
+      setEditStage(selectedApp.stage);
+      setEditLocation(selectedApp.location || "");
+      setEditEmployment(selectedApp.employment || "Full-time");
+      setEditJobUrl(selectedApp.jobUrl || "");
+      setEditDateApplied(selectedApp.dateApplied || "");
+      setEditNotes(selectedApp.notes || "");
+    } else if (pendingAction === "close_add") {
+      setShowAddModal(false);
+      setTriedSubmit(false);
+      // Reset form
+      setCompanyName("");
+      setJobTitle("");
+      setJobUrl("");
+      setAppStage("APPLIED");
+      setAddLocation("");
+      setAddEmployment("Full-time");
+      setDateApplied("");
+      setNotes("");
+    }
+    setShowDiscardConfirm(false);
+    setPendingAction(null);
   };
 
   // Handle delete/archive
-  const handleArchive = () => {
+  const handleArchive = async () => {
     if (!selectedApp) return;
-    setApps((prev) => prev.filter((a) => a.id !== selectedApp.id));
-    setSelectedApp(null);
+    
+    if (!deleteConfirm) {
+      setDeleteConfirm(true);
+      setTimeout(() => setDeleteConfirm(false), 3000);
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${API_URL}/jobs/${selectedApp.id}`, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
+      const json = await response.json();
+      
+      if (json.success) {
+        setApps((prev) => prev.filter((a) => a.id !== selectedApp.id));
+        setSelectedApp(null);
+        setDeleteConfirm(false);
+        showToast("Application archived successfully");
+      }
+    } catch (error) {
+      console.error("Error deleting job:", error);
+    }
+  };
+
+  const handleShare = () => {
+    if (!selectedApp) return;
+    const shareText = `Check out this job opportunity I'm tracking!\n\nCompany: ${selectedApp.company}\nRole: ${selectedApp.role}\nStatus: ${selectedApp.stage}\nLink: ${selectedApp.jobUrl || 'N/A'}`;
+    navigator.clipboard.writeText(shareText).then(() => {
+      showToast("Details copied to clipboard!");
+    });
   };
 
   // Derived statistics
@@ -363,67 +564,162 @@ const JobTrackerPage = () => {
     };
   }, [apps]);
 
-  // Filtered lists for Kanban
+  // Filtered and Sorted lists for Kanban and Table
   const filteredApps = useMemo(() => {
-    return apps.filter((a) => {
+    let result = apps.filter((a) => {
       const matchSearch =
         a.company.toLowerCase().includes(search.toLowerCase()) ||
         a.role.toLowerCase().includes(search.toLowerCase());
       const matchStatus = statusFilter === "All" || a.stage === statusFilter;
       return matchSearch && matchStatus;
     });
-  }, [apps, search, statusFilter]);
+
+    // Apply sorting
+    result.sort((a, b) => {
+      // Use dateApplied if present, otherwise fallback to id/creation logic
+      const dateA = new Date(a.dateApplied || a.createdAt).getTime() || 0;
+      const dateB = new Date(b.dateApplied || b.createdAt).getTime() || 0;
+      return sortOrder === "DESC" ? dateB - dateA : dateA - dateB;
+    });
+
+    return result;
+  }, [apps, search, statusFilter, sortOrder]);
 
   // Timeline steps for the bottom timeline
   const timelineSteps = useMemo(() => {
     if (!selectedApp) return [];
-    const appDate = selectedApp.dateApplied || "06/18/2026";
+    const appDate = selectedApp.dateApplied || new Date().toISOString().split('T')[0];
+    let baseDate = new Date(appDate);
+    if (isNaN(baseDate.getTime())) baseDate = new Date();
 
-    // Parse applied date base
-    let appliedDateText = appDate;
-    let assessmentDateText = "Pending";
-    let interviewDateText = "Pending";
+    const addDaysStr = (date, days) => {
+      const newD = new Date(date);
+      newD.setDate(newD.getDate() + days);
+      return newD.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+    };
+
+    const activeStage = isEditing ? editStage : selectedApp.stage;
+    const progression = ["APPLIED", "ASSESSMENT", "INTERVIEW", "FINAL_INTERVIEW", "OFFER"];
+    const isRejected = activeStage === "REJECTED";
+    
+    // Determine the highest stage achieved before rejection
+    let highestStageIndex = progression.indexOf(activeStage);
+    if (isRejected) {
+      if (selectedApp.stage !== "REJECTED") {
+        highestStageIndex = progression.indexOf(selectedApp.stage);
+      } else {
+        // If it was already rejected and we don't know the prior stage, just assume APPLIED
+        highestStageIndex = 0; 
+      }
+    }
+
+    // If it's a Wishlist, we haven't even applied yet.
+    if (activeStage === "WISHLIST") highestStageIndex = -1;
+
+    const steps = [];
+
+    // 1. Applied
+    steps.push({
+      name: "Applied",
+      key: "APPLIED",
+      date: highestStageIndex >= 0 || isRejected ? addDaysStr(baseDate, 0) : "Pending",
+      done: highestStageIndex >= 0 || isRejected,
+      isRejected: false
+    });
+
+    // 2. Assessment
+    if (!isRejected || highestStageIndex >= 1) {
+      steps.push({
+        name: "Assessment",
+        key: "ASSESSMENT",
+        date: highestStageIndex >= 1 ? addDaysStr(baseDate, 4) : "Pending",
+        done: highestStageIndex >= 1,
+        isRejected: false
+      });
+    }
+
+    // 3. Interview
+    if (!isRejected || highestStageIndex >= 2) {
+      steps.push({
+        name: "Interview",
+        key: "INTERVIEW",
+        date: highestStageIndex >= 2 ? addDaysStr(baseDate, 7) : "Pending",
+        done: highestStageIndex >= 2,
+        isRejected: false
+      });
+    }
+
+    // 4. Final Interview (only show if they reached at least Interview)
+    if (!isRejected || highestStageIndex >= 3) {
+      if (highestStageIndex >= 2 || !isRejected) {
+        steps.push({
+          name: "Final Interview",
+          key: "FINAL_INTERVIEW",
+          date: highestStageIndex >= 3 ? addDaysStr(baseDate, 12) : "Pending",
+          done: highestStageIndex >= 3,
+          isRejected: false
+        });
+      }
+    }
+
+    // 5. Offer or Rejected
+    if (isRejected) {
+      steps.push({
+        name: "Rejected",
+        key: "REJECTED",
+        date: addDaysStr(baseDate, 14),
+        done: true,
+        isRejected: true
+      });
+    } else if (highestStageIndex >= 4) {
+      steps.push({
+        name: "Offer Extended",
+        key: "OFFER",
+        date: addDaysStr(baseDate, 14),
+        done: true,
+        isRejected: false
+      });
+    }
+
+    return steps;
+  }, [selectedApp, isEditing, editStage]);
+
+  // Handle click on timeline to quick-update status
+  const handleTimelineClick = async (newStageKey) => {
+    if (!selectedApp || !newStageKey) return;
+    
+    // If in Edit mode, clicking timeline should just update the dropdown selection
+    if (isEditing) {
+      if (editStage === newStageKey) return;
+      setEditStage(newStageKey);
+      return;
+    }
+
+    // Otherwise, normal behavior: optimistic update & save
+    if (selectedApp.stage === newStageKey) return;
+    
+    const stageObj = stages.find(s => s.key === newStageKey);
+    const updateData = { stage: newStageKey, badge: stageObj?.name.toUpperCase() };
+
+    // Optimistic Update
+    setSelectedApp(prev => ({ ...prev, ...updateData }));
+    setApps(prev => prev.map(a => a.id === selectedApp.id ? { ...a, ...updateData } : a));
 
     try {
-      const dateObj = new Date(appDate);
-      if (!isNaN(dateObj.getTime())) {
-        const addDays = (d, days) => {
-          const newD = new Date(d);
-          newD.setDate(newD.getDate() + days);
-          return newD.toLocaleDateString(undefined, {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          });
-        };
-        appliedDateText = dateObj.toLocaleDateString(undefined, {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        });
-        assessmentDateText = addDays(dateObj, 4);
-        interviewDateText = addDays(dateObj, 7);
-      }
-    } catch (e) {}
-
-    const activeStage = selectedApp.stage;
-
-    return [
-      { name: "Applied", date: appliedDateText, done: true },
-      {
-        name: "Assessment",
-        date: assessmentDateText,
-        done: ["ASSESSMENT", "INTERVIEW", "FINAL_INTERVIEW", "OFFER"].includes(
-          activeStage,
-        ),
-      },
-      {
-        name: "Interview",
-        date: interviewDateText,
-        done: ["INTERVIEW", "FINAL_INTERVIEW", "OFFER"].includes(activeStage),
-      },
-    ];
-  }, [selectedApp]);
+      await fetch(`${API_URL}/jobs/${selectedApp.id}`, {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify(updateData),
+      });
+      showToast(`Status updated to ${stageObj?.name}`);
+    } catch (error) {
+      console.error("Error updating timeline stage:", error);
+    }
+  };
 
   return (
     <div className="w-full space-y-8 relative">
@@ -441,7 +737,7 @@ const JobTrackerPage = () => {
           onClick={() => setShowAddModal(true)}
           className="shrink-0 flex items-center justify-center gap-2 px-6 py-3 rounded-full
                                bg-gradient-to-br from-violet-600 to-purple-500 hover:from-violet-500 hover:to-purple-400
-                               text-slate-900 dark:text-white text-sm font-bold shadow-[0_10px_25px_rgba(93,33,223,0.25)] hover:scale-102 transition-all"
+                               text-slate-900 dark:text-white text-sm font-bold shadow-[0_10px_25px_rgba(93,33,223,0.25)] hover:scale-102 transition-all cursor-pointer"
         >
           <span className="material-symbols-outlined text-[16px] font-bold">
             add
@@ -640,12 +936,17 @@ const JobTrackerPage = () => {
           </div>
 
           {/* Sort button/indicator */}
-          <div className="flex items-center gap-2 bg-white dark:bg-[#1e1f23] border border-slate-200 dark:border-white/8 rounded-xl px-4 py-3 text-[0.85rem] text-slate-600 dark:text-white/60">
-            <span className="material-symbols-outlined text-[16px]">
-              calendar_today
-            </span>
-            <span>Recent First</span>
-          </div>
+          <button 
+            onClick={() => setSortOrder(prev => prev === "DESC" ? "ASC" : "DESC")}
+            className="flex items-center justify-between gap-2 bg-white dark:bg-[#1e1f23] hover:bg-slate-50 dark:hover:bg-[#25262b] border border-slate-200 dark:border-white/8 rounded-xl px-4 py-3 text-[0.85rem] text-slate-600 dark:text-white/60 transition-colors w-full md:w-36"
+          >
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[16px]">
+                {sortOrder === "DESC" ? "arrow_downward" : "arrow_upward"}
+              </span>
+              <span>{sortOrder === "DESC" ? "Recent" : "Oldest"}</span>
+            </div>
+          </button>
         </div>
       </div>
 
@@ -709,17 +1010,11 @@ const JobTrackerPage = () => {
       {/* ── Modal Overlay Form (Add Application) ── */}
       {showAddModal &&
         createPortal(
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-            {/* Backdrop */}
+          <div className="fixed inset-0 z-[50] flex items-center justify-center p-4">
             <div
-              onClick={() => {
-                setShowAddModal(false);
-                setTriedSubmit(false);
-              }}
-              className="absolute inset-0 bg-black/80 backdrop-blur-2xl transition-all duration-300"
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity cursor-pointer"
+              onClick={handleCloseAddModal}
             />
-
-            {/* Form Container */}
             <div className="relative z-10 w-full max-w-[calc(100vw-2rem)] sm:max-w-xl rounded-3xl bg-white dark:bg-[#131417] border border-slate-200 dark:border-white/10 p-5 sm:p-8 md:p-10 shadow-[0_30px_70px_rgba(0,0,0,0.85)] max-h-[90vh] overflow-y-auto no-scrollbar">
               {/* Top-Right Close Button */}
               <button
@@ -799,17 +1094,52 @@ const JobTrackerPage = () => {
                       Job URL
                     </label>
                     <div className="relative">
-                      <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/20 text-[18px]">
+                      <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/20 text-[18px] pointer-events-none">
                         link
                       </span>
                       <input
-                        type="url"
+                        type="text"
                         value={jobUrl}
                         onChange={(e) => setJobUrl(e.target.value)}
                         placeholder="https://careers.company.co"
                         className="w-full bg-white dark:bg-[#121316] border border-slate-200 dark:border-white/5 rounded-xl pl-11 pr-4 py-3 text-[0.85rem] text-slate-900 dark:text-white placeholder:text-slate-500 dark:text-white/40 focus:outline-none focus:border-primary/45 transition-all"
                       />
                     </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[0.65rem] uppercase tracking-widest font-black text-slate-500 dark:text-white/40">
+                      Location
+                    </label>
+                    <div className="relative">
+                      <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-white/20 text-[18px] pointer-events-none">
+                        location_on
+                      </span>
+                      <input
+                        type="text"
+                        value={addLocation}
+                        onChange={(e) => setAddLocation(e.target.value)}
+                        placeholder="e.g. San Francisco, CA (Hybrid)"
+                        className="w-full bg-white dark:bg-[#121316] border border-slate-200 dark:border-white/5 rounded-xl pl-11 pr-4 py-3 text-[0.85rem] text-slate-900 dark:text-white placeholder:text-slate-500 dark:text-white/40 focus:outline-none focus:border-primary/45 transition-all"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="space-y-2">
+                    <label className="text-[0.65rem] uppercase tracking-widest font-black text-slate-500 dark:text-white/40">
+                      Employment Type
+                    </label>
+                    <select
+                      value={addEmployment}
+                      onChange={(e) => setAddEmployment(e.target.value)}
+                      className="w-full bg-white dark:bg-[#121316] border border-slate-200 dark:border-white/5 rounded-xl px-4 py-3 text-[0.85rem] text-slate-900 dark:text-white focus:outline-none focus:border-primary/45 transition-all"
+                    >
+                      <option value="Full-time">Full-time</option>
+                      <option value="Part-time">Part-time</option>
+                      <option value="Contract">Contract</option>
+                      <option value="Internship">Internship</option>
+                    </select>
                   </div>
                   <div className="space-y-2">
                     <label className="text-[0.65rem] uppercase tracking-widest font-black text-slate-500 dark:text-white/40">
@@ -888,11 +1218,8 @@ const JobTrackerPage = () => {
                 <div className="flex justify-end items-center gap-5 pt-4">
                   <button
                     type="button"
-                    onClick={() => {
-                      setShowAddModal(false);
-                      setTriedSubmit(false);
-                    }}
-                    className="text-xs font-bold text-slate-500 dark:text-white/40 hover:text-slate-700 dark:text-white/80 transition-colors uppercase tracking-widest"
+                    onClick={handleCloseAddModal}
+                    className="text-xs font-bold text-slate-500 dark:text-white/40 hover:text-slate-700 dark:text-white/80 transition-colors uppercase tracking-widest cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -916,7 +1243,7 @@ const JobTrackerPage = () => {
           <div className="fixed inset-0 z-[9999] flex justify-end">
             {/* Backdrop */}
             <div
-              onClick={() => setSelectedApp(null)}
+              onClick={handleCloseDrawer}
               className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-all duration-300"
             />
 
@@ -926,8 +1253,8 @@ const JobTrackerPage = () => {
                 {/* Drawer Top Navigation bar */}
                 <div className="flex items-center justify-between">
                   <button
-                    onClick={() => setSelectedApp(null)}
-                    className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/50 hover:bg-slate-200 dark:bg-white/10 hover:text-slate-900 dark:text-white flex items-center justify-center transition-all"
+                    onClick={handleCloseDrawer}
+                    className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/50 hover:bg-slate-200 dark:bg-white/10 hover:text-slate-900 dark:text-white flex items-center justify-center transition-all cursor-pointer"
                     aria-label="Close details"
                   >
                     <span className="material-symbols-outlined text-[20px]">
@@ -936,8 +1263,8 @@ const JobTrackerPage = () => {
                   </button>
 
                   <button
-                    onClick={() => setIsEditing(!isEditing)}
-                    className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:bg-white/10 border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-900 dark:text-white transition-all"
+                    onClick={handleToggleEdit}
+                    className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:bg-white/10 border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-900 dark:text-white transition-all cursor-pointer"
                   >
                     {isEditing ? "Cancel" : "Edit Details"}
                   </button>
@@ -993,8 +1320,8 @@ const JobTrackerPage = () => {
                         onClick={() =>
                           setDrawerDropdownOpen(!drawerDropdownOpen)
                         }
-                        className={`w-full bg-white dark:bg-[#1c1d22] border rounded-xl px-3.5 py-3 text-[0.85rem] text-slate-700 dark:text-white/85 text-left flex items-center justify-between gap-2
-                                                ${isEditing ? "border-slate-200 dark:border-white/10 hover:border-slate-300 dark:border-white/20" : "border-transparent cursor-default"}`}
+                        className={`w-full bg-white dark:bg-[#1c1d22] border rounded-xl px-4 py-3.5 text-[0.85rem] text-slate-700 dark:text-white/85 text-left flex items-center justify-between gap-2 shadow-sm transition-all
+                                                ${isEditing ? "border-slate-200 dark:border-white/10 hover:border-violet-500/50 hover:bg-slate-50 dark:hover:bg-[#1e1f23] cursor-pointer" : "border-transparent cursor-default"}`}
                       >
                         <span className="flex items-center gap-2">
                           <span
@@ -1016,7 +1343,7 @@ const JobTrackerPage = () => {
                       </button>
 
                       {isEditing && drawerDropdownOpen && (
-                        <div className="absolute left-0 right-0 mt-2 rounded-xl bg-white dark:bg-[#141519] border border-slate-200 dark:border-white/10 p-1.5 shadow-[0_15px_30px_rgba(0,0,0,0.5)] z-30 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                        <div className="absolute left-0 right-0 mt-2 rounded-xl bg-white dark:bg-[#1c1d22] border border-slate-200 dark:border-white/10 p-2 shadow-xl shadow-black/20 z-30 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                           {stages.map((stage) => (
                             <button
                               key={stage.key}
@@ -1025,7 +1352,7 @@ const JobTrackerPage = () => {
                                 setEditStage(stage.key);
                                 setDrawerDropdownOpen(false);
                               }}
-                              className="w-full px-3 py-2 rounded-lg text-left text-[0.85rem] text-slate-600 dark:text-white/70 hover:bg-slate-100 dark:bg-white/5 hover:text-slate-900 dark:text-white flex items-center gap-2.5 transition-all"
+                              className="w-full px-3 py-2.5 rounded-lg text-left text-[0.85rem] font-medium text-slate-600 dark:text-white/70 hover:bg-violet-50 dark:hover:bg-violet-500/10 hover:text-violet-600 dark:hover:text-violet-400 flex items-center gap-3 transition-colors cursor-pointer"
                             >
                               <span
                                 className={`w-2 h-2 rounded-full ${stage.dot}`}
@@ -1112,7 +1439,7 @@ const JobTrackerPage = () => {
                       </span>
                       {isEditing ? (
                         <input
-                          type="url"
+                          type="text"
                           value={editJobUrl}
                           onChange={(e) => setEditJobUrl(e.target.value)}
                           placeholder="https://careers.company.co"
@@ -1172,24 +1499,27 @@ const JobTrackerPage = () => {
                   <h4 className="text-[0.65rem] uppercase tracking-widest font-black text-slate-500 dark:text-white/40">
                     Status Timeline
                   </h4>
-                  <div className="relative pl-6 space-y-4 before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100 dark:bg-white/5">
+                  <div className="relative pl-8 space-y-2 before:absolute before:left-[11px] before:top-3 before:bottom-3 before:w-[2px] before:bg-slate-200 dark:before:bg-white/10">
                     {timelineSteps.map((step, idx) => (
                       <div
                         key={idx}
-                        className="relative flex items-center justify-between text-xs"
+                        className="relative flex items-center justify-between text-xs p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer transition-colors group"
+                        onClick={() => handleTimelineClick(step.key)}
                       >
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                           <div
-                            className={`absolute -left-[23px] w-4 h-4 rounded-full border-2 bg-white dark:bg-[#17181c] z-10 flex items-center justify-center
-                                                    ${step.done ? "border-violet-500 bg-white dark:bg-[#17181c]" : "border-slate-200 dark:border-white/10"}`}
+                            className={`absolute -left-[27px] w-3.5 h-3.5 rounded-full border-[2px] bg-white dark:bg-[#17181c] z-10 flex items-center justify-center transition-colors
+                                                    ${step.isRejected ? "border-rose-500" : step.done ? "border-violet-500" : "border-slate-300 dark:border-white/20 group-hover:border-violet-500/50"}`}
                           >
                             {step.done && (
-                              <div className="w-1.5 h-1.5 rounded-full bg-violet-500" />
+                              <div className={`w-[6px] h-[6px] rounded-full ${step.isRejected ? "bg-rose-500" : "bg-violet-500"}`} />
                             )}
                           </div>
                           <span
                             className={
-                              step.done
+                              step.isRejected
+                                ? "text-rose-500 font-bold"
+                                : step.done
                                 ? "text-slate-900 dark:text-white font-medium"
                                 : "text-slate-400 dark:text-white/30"
                             }
@@ -1210,16 +1540,22 @@ const JobTrackerPage = () => {
               <div className="flex items-center justify-between pt-8 mt-8 border-t border-slate-200 dark:border-white/5 gap-4">
                 <button
                   onClick={handleArchive}
-                  className="flex items-center gap-2 text-rose-400 hover:text-rose-300 text-[0.7rem] font-black uppercase tracking-wider transition-all"
+                  className={`flex items-center gap-2 text-[0.7rem] font-black uppercase tracking-wider transition-all px-3 py-1.5 rounded-lg cursor-pointer ${
+                    deleteConfirm ? "bg-rose-500/10 text-rose-500" : "text-rose-400 hover:text-rose-300 hover:bg-rose-500/5"
+                  }`}
                 >
                   <span className="material-symbols-outlined text-[18px]">
                     delete
                   </span>
-                  Archive Application
+                  {deleteConfirm ? "Confirm Delete?" : "Archive Application"}
                 </button>
 
                 <div className="flex items-center gap-3">
-                  <button className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-white/60 hover:text-slate-900 dark:text-white flex items-center justify-center transition-all">
+                  <button 
+                    onClick={handleShare}
+                    className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-white/60 hover:text-slate-900 dark:text-white flex items-center justify-center transition-all cursor-pointer"
+                    title="Copy details to clipboard"
+                  >
                     <span className="material-symbols-outlined text-[18px]">
                       share
                     </span>
@@ -1227,10 +1563,10 @@ const JobTrackerPage = () => {
                   {isEditing && (
                     <button
                       onClick={handleSaveDrawer}
-                      className="px-5 py-2.5 rounded-full bg-gradient-to-br from-violet-600 to-purple-500 hover:from-violet-500 hover:to-purple-400
-                                                   text-slate-900 dark:text-white text-xs font-bold uppercase tracking-wider shadow-[0_10px_20px_rgba(93,33,223,0.2)] hover:scale-102 transition-all"
+                      className="px-6 py-2.5 rounded-full bg-gradient-to-r from-violet-600 via-purple-600 to-violet-500 hover:from-violet-500 hover:via-purple-500 hover:to-violet-400 text-white text-[0.75rem] font-black uppercase tracking-[0.15em] shadow-[0_8px_20px_rgba(124,58,237,0.3)] hover:shadow-[0_12px_25px_rgba(124,58,237,0.45)] hover:-translate-y-0.5 transition-all cursor-pointer border border-white/10 flex items-center gap-2"
                     >
-                      Save Changes
+                      <span className="material-symbols-outlined text-[16px]">save</span>
+                      Save
                     </button>
                   )}
                 </div>
@@ -1239,6 +1575,58 @@ const JobTrackerPage = () => {
           </div>,
           document.body,
         )}
+
+      {/* ── Custom Discard Confirm Modal ── */}
+      {showDiscardConfirm && createPortal(
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center">
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
+            onClick={() => setShowDiscardConfirm(false)}
+          />
+          <div className="relative w-full max-w-sm bg-white dark:bg-[#121316] border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-2xl z-10 animate-fade-in-up">
+            <div className="w-12 h-12 rounded-2xl bg-orange-500/10 flex items-center justify-center mb-4 border border-orange-500/20">
+              <span className="material-symbols-outlined text-orange-400 text-2xl">
+                warning
+              </span>
+            </div>
+            <h3 className="text-xl font-extrabold text-slate-900 dark:text-white mb-2">
+              Unsaved Changes
+            </h3>
+            <p className="text-[0.85rem] text-slate-500 dark:text-white/60 mb-8 leading-relaxed">
+              You have made changes to this application that haven't been saved yet. Do you want to discard these changes?
+            </p>
+            <div className="flex items-center gap-3 w-full">
+              <button
+                onClick={() => setShowDiscardConfirm(false)}
+                className="flex-1 py-3 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:bg-white/10 text-[0.85rem] font-bold text-slate-700 dark:text-white transition-colors cursor-pointer"
+              >
+                Keep Editing
+              </button>
+              <button
+                onClick={executeDiscard}
+                className="flex-1 py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white text-[0.85rem] font-bold shadow-lg shadow-red-500/25 transition-all cursor-pointer"
+              >
+                Discard
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* ── Custom Toast Notification ── */}
+      {toast.show && createPortal(
+        <div className="fixed bottom-6 right-6 z-[99999] bg-gradient-to-r from-[#1e1f23] to-[#25262b] border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.4)] rounded-2xl p-4 flex items-center gap-4 animate-fade-in-up transform transition-all duration-300">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+            <span className="material-symbols-outlined text-[20px] text-white font-bold">check</span>
+          </div>
+          <div className="pr-4">
+            <h4 className="text-[0.85rem] font-extrabold text-white tracking-wide mb-0.5">Success</h4>
+            <p className="text-[0.75rem] font-medium text-emerald-400">{toast.message}</p>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };

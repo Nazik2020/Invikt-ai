@@ -47,13 +47,21 @@ const SettingsPage = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 md:gap-3 px-4 py-2.5 md:py-3 rounded-xl transition-all text-sm font-medium whitespace-nowrap shrink-0 md:shrink ${
+                  className={`group relative flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all duration-200 text-[13px] md:text-[14px] font-semibold whitespace-nowrap shrink-0 md:shrink text-left ${
                     isActive
-                      ? "bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white shadow-sm"
-                      : "text-slate-600 dark:text-white/60 hover:text-slate-900 dark:text-white hover:bg-slate-100 dark:bg-white/5 border border-transparent"
+                      ? "bg-white dark:bg-[#202126] text-slate-900 dark:text-white shadow-[0_2px_10px_rgba(0,0,0,0.04)] dark:shadow-none border border-slate-200/50 dark:border-white/5"
+                      : "text-slate-500 dark:text-white/50 hover:bg-slate-50 dark:hover:bg-[#1c1d22]/50 hover:text-slate-700 dark:hover:text-white/80 border border-transparent"
                   }`}
                 >
-                  <span className="material-symbols-outlined text-[16px] md:text-[18px]">
+                  {isActive && (
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-violet-500 dark:bg-primary hidden md:block" />
+                  )}
+                  <span 
+                    className={`material-symbols-outlined text-[18px] md:text-[20px] transition-all duration-200 ${
+                      isActive ? "text-violet-600 dark:text-primary" : "text-slate-400 dark:text-white/40 group-hover:text-slate-500 dark:group-hover:text-white/60"
+                    }`}
+                    style={{ fontVariationSettings: isActive ? "'FILL' 1, 'wght' 500" : "'FILL' 0, 'wght' 400" }}
+                  >
                     {tab.icon}
                   </span>
                   {tab.label}

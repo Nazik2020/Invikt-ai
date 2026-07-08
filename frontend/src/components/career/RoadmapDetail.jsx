@@ -281,9 +281,9 @@ const RoadmapDetail = () => {
           Career Path
         </div>
 
-        <h1 className="font-headline text-5xl md:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center justify-center gap-4">
-          {roadmap.icon && <span className="material-symbols-outlined text-[48px] text-violet-600">{roadmap.icon}</span>}
-          {roadmap.title}
+        <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 dark:text-white tracking-tight flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 max-w-4xl text-center md:text-left">
+          {roadmap.icon && <span className="material-symbols-outlined text-[40px] md:text-[48px] text-violet-600 shrink-0">{roadmap.icon}</span>}
+          <span className="leading-[1.15]">{roadmap.title}</span>
         </h1>
 
         <div className="flex items-center justify-center gap-4 text-slate-500 dark:text-white/50 text-sm font-medium">

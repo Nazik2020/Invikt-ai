@@ -107,7 +107,7 @@ const ResetPasswordPage = () => {
                   type="email"
                   required
                   placeholder="name@company.com"
-                  className="w-full bg-slate-50 dark:bg-[#1c1d22]/50 border border-slate-200 dark:border-white/5 rounded-2xl pl-12 pr-4 py-4 text-[15px] text-slate-900 dark:text-white placeholder:text-slate-400 dark:text-white/30 focus:outline-none focus:border-[#cdbdff]/40 focus:bg-white dark:bg-[#1c1d22] transition-all"
+                  className="w-full bg-slate-50 dark:bg-[#1c1d22]/50 border rounded-xl pl-12 pr-4 py-3 text-[14px] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/20 border-slate-200 dark:border-white/8 focus:border-violet-500/60 focus:outline-none transition-all"
                 />
               </div>
             </div>
