@@ -19,6 +19,8 @@ import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import SettingsPage from "./pages/SettingsPage";
+import PortfolioPage from "./pages/Portfolio/PortfolioPage";
+import PublicPortfolioPage from "./pages/PublicPortfolio/PublicPortfolioPage";
 
 // Admin
 import AdminLayout from "./layouts/AdminLayout";
@@ -40,6 +42,9 @@ const App = () => {
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/forgot-password" element={<ResetPasswordPage />} />
+        
+        {/* Public Portfolio Route */}
+        <Route path="/p/:username" element={<PublicPortfolioPage />} />
 
         {/* Regular User Dashboard Routes (Protected) */}
         <Route element={<ProtectedRoute />}>
@@ -51,6 +56,7 @@ const App = () => {
             <Route path="career-path/:id" element={<RoadmapDetail />} />
             <Route path="learning-hub" element={<LearningHubPage />} />
             <Route path="job-tracker" element={<JobTrackerPage />} />
+            <Route path="portfolio" element={<PortfolioPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route
               path="support"

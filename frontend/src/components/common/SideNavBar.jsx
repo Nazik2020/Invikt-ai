@@ -31,6 +31,12 @@ const v1Nav = [
     icon: "description",
     description: "AI resume breakdown",
   },
+  {
+    name: "Portfolio",
+    path: "/portfolio",
+    icon: "deployed_code",
+    description: "Manage your live portfolio",
+  },
 ];
 
 const v2Nav = [
