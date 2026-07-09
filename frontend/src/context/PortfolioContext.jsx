@@ -17,6 +17,7 @@ export const PortfolioProvider = ({ children }) => {
     personalInfo: {
       fullName: '',
       tagline: '',
+      primaryDomain: '',
       location: '',
       showEmail: false,
       bio: '',

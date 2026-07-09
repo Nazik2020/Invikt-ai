@@ -49,8 +49,25 @@ const LivePreview = () => {
           <div className="w-full flex flex-col items-start text-left relative z-10">
             
             {/* Image (Top on mobile due to flex-col-reverse in real page) */}
-            <div className="w-full relative flex justify-center items-center mb-16 px-6">
-              <div className="relative z-10 w-[300px] h-[340px] bg-gradient-to-br from-gray-200 to-gray-400 rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/5">
+            <div className="w-full relative flex justify-center items-center mb-24 px-6 mt-8">
+              {/* Geometric background lines matching desktop */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 opacity-100">
+                {/* Box 1 (Inner Rotating) */}
+                <div className="w-[220px] h-[220px] border-[2px] border-violet-500/80 rounded-[2rem] absolute transition-colors animate-[spin_30s_linear_infinite]">
+                  <div className="absolute top-[10%] left-[10%] w-1.5 h-1.5 rounded-full bg-violet-400 shadow-[0_0_10px_rgba(167,139,250,0.9)]"></div>
+                </div>
+                
+                {/* Box 2 (Middle Rotating) */}
+                <div className="w-[250px] h-[250px] border-[2px] border-violet-500/50 rounded-[2.5rem] absolute transition-colors animate-[spin_40s_linear_infinite_reverse]">
+                  <div className="absolute bottom-[15%] right-[15%] w-1.5 h-1.5 rounded-full bg-violet-300 shadow-[0_0_10px_rgba(167,139,250,0.9)]"></div>
+                </div>
+
+                {/* Box 3 (Outer Static - NO dot) */}
+                <div className="w-[280px] h-[280px] border-[2px] border-violet-500/20 rounded-[3rem] absolute transition-colors rotate-0">
+                </div>
+              </div>
+              
+              <div className="relative z-10 w-[240px] h-[280px] bg-gradient-to-br from-gray-200 to-gray-400 rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/5">
                 {avatarUrl ? (
                   <img 
                     src={avatarUrl} 
@@ -63,19 +80,26 @@ const LivePreview = () => {
                   </div>
                 )}
                 
-                {/* Glassmorphic overlay card (Bar chart) */}
-                <div className="absolute -bottom-6 -right-2 w-32 h-32 bg-[#16171b]/60 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl flex items-end justify-center gap-2 p-4 z-20">
-                  <div className="w-5 h-10 bg-violet-400/90 rounded-md shadow-[0_0_10px_rgba(167,139,250,0.4)]"></div>
-                  <div className="w-5 h-20 bg-[#C7A2FF] rounded-md shadow-[0_0_15px_rgba(199,162,255,0.6)]"></div>
-                  <div className="w-5 h-12 bg-pink-900/80 rounded-md"></div>
+                {/* Glassmorphic overlay card (Bar chart) and Resume badge */}
+                <div className="absolute -bottom-6 -right-2 z-20 flex flex-col items-end animate-[float_6s_ease-in-out_infinite]">
+                  <div className="w-32 h-32 bg-white/5 dark:bg-[#1a1b23]/50 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.4)] flex items-end justify-center gap-2 p-4 relative z-10">
+                    <div className="w-5 h-10 bg-[#687399] rounded-sm"></div>
+                    <div className="w-5 h-20 bg-[#8a5cf6] rounded-sm shadow-[0_0_15px_rgba(138,92,246,0.3)]"></div>
+                    <div className="w-5 h-14 bg-[#8c5a66] rounded-sm"></div>
+                  </div>
+                  
+                  <div className="flex items-center gap-1.5 mt-2 mr-1 z-20">
+                    <span className="material-symbols-outlined text-[28px] text-gray-300 font-light">description</span>
+                    <span className="text-[0.7rem] font-bold tracking-[0.2em] text-white uppercase mt-1">Resume</span>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Text Content */}
             <div className="flex-1 flex flex-col items-start text-left z-10 w-full px-6">
-              <p className="text-[0.75rem] font-bold tracking-[0.25em] text-gray-400 uppercase mb-6">
-                {portfolioData.technologies && portfolioData.technologies.length > 0 ? portfolioData.technologies[0]?.tools[0]?.name || "PORTFOLIO" : "PORTFOLIO"}
+              <p className="text-[0.45rem] font-bold tracking-[0.25em] text-gray-400 uppercase mb-2">
+                {portfolioData.personalInfo.primaryDomain || "PORTFOLIO"}
               </p>
               
               <h1 className="text-[3.5rem] leading-[1.05] font-sans font-black tracking-tight text-white mb-0 transition-colors uppercase">
@@ -125,9 +149,15 @@ const LivePreview = () => {
                     exp.role && (
                       <div key={idx} className="relative pl-6">
                         {/* Glowing Timeline dot */}
-                        <div className="absolute w-3.5 h-3.5 rounded-full bg-[#d8b4fe] -left-[7.5px] top-1 shadow-[0_0_12px_rgba(216,180,254,0.8)]" />
+                        <div className={`absolute w-3.5 h-3.5 rounded-full -left-[7.5px] top-1 ${
+                          idx === 0 
+                            ? "bg-[#d8b4fe] shadow-[0_0_12px_rgba(216,180,254,0.8)]" 
+                            : "bg-[#fb7185] shadow-[0_0_12px_rgba(251,113,133,0.8)]"
+                        }`} />
                         
-                        <p className="text-[0.65rem] font-bold tracking-[0.2em] text-violet-300 uppercase mb-1.5">
+                        <p className={`text-[0.65rem] font-bold tracking-[0.2em] uppercase mb-1.5 ${
+                          idx === 0 ? "text-violet-300" : "text-[#fb7185]"
+                        }`}>
                           {exp.period}
                         </p>
                         <h3 className="text-[1.1rem] font-bold text-white mb-0.5 tracking-wide">
@@ -199,11 +229,11 @@ const LivePreview = () => {
                 <div className="flex flex-col gap-4">
                   {portfolioData.projects.map((proj, idx) => (
                     proj.title && (
-                      <div key={idx} className="w-full bg-[#101217]/80 border border-violet-500/30 rounded-lg overflow-hidden flex flex-col text-left">
+                      <div key={idx} className="w-full bg-[#101217]/80 border border-violet-500/20 rounded-2xl overflow-hidden flex flex-col text-left shadow-sm">
                         {proj.imageUrl ? (
-                          <div className="w-full h-32 bg-white/10 relative">
+                          <div className="w-full h-32 bg-white/10 relative border-b border-violet-500/20">
                             <img src={proj.imageUrl} className="w-full h-full object-cover" alt="" />
-                            {proj.badge && <span className="absolute top-3 left-3 px-2 py-1 bg-violet-600 text-white text-[0.6rem] font-black uppercase tracking-wider rounded-md">{proj.badge}</span>}
+                            {proj.badge && <span className="absolute top-3 right-3 px-2 py-1 bg-[#16171b]/90 backdrop-blur-md text-gray-300 text-[0.6rem] font-black uppercase tracking-wider rounded-full border border-violet-500/30">{proj.badge}</span>}
                           </div>
                         ) : (
                           <div className="w-full h-24 bg-white/5 flex items-center justify-center">
@@ -220,7 +250,7 @@ const LivePreview = () => {
                           {proj.tags && (
                             <div className="flex flex-wrap gap-1.5 mt-auto">
                               {proj.tags.split(',').map((tag, tIdx) => tag.trim() && (
-                                <span key={tIdx} className="px-2 py-0.5 rounded-full border border-white/10 bg-white/5 text-gray-400 text-[0.65rem] font-medium whitespace-nowrap">
+                                <span key={tIdx} className="px-2 py-0.5 rounded-full border border-violet-500/20 bg-[#1a1b23] text-gray-400 text-[0.65rem] font-medium whitespace-nowrap">
                                   {tag.trim()}
                                 </span>
                               ))}
@@ -241,7 +271,7 @@ const LivePreview = () => {
                 <div className="flex flex-col gap-4">
                   {portfolioData.certifications.map((cert, idx) => (
                     cert.title && (
-                      <div key={idx} className="w-full bg-[#121318]/50 border border-violet-500/30 rounded-lg p-5 flex flex-col text-left">
+                      <div key={idx} className="w-full bg-[#121318]/50 border border-violet-500/20 rounded-2xl p-5 flex flex-col text-left shadow-sm">
                         <div className="flex justify-between items-start gap-3 mb-1.5">
                           <h3 className="text-[0.9rem] font-bold text-white leading-snug uppercase">{cert.title}</h3>
                           {cert.certificateUrl && (
@@ -252,7 +282,7 @@ const LivePreview = () => {
                           {cert.provider} {cert.date && `• ${cert.date}`}
                         </p>
                         {cert.skills && (
-                          <p className="text-[0.75rem] text-gray-400 leading-relaxed mt-auto">
+                          <p className="text-[0.75rem] text-gray-400 leading-relaxed">
                             <span className="font-bold text-gray-300">Skills gained:</span> {cert.skills}
                           </p>
                         )}

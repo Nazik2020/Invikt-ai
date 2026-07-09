@@ -9,6 +9,7 @@ const PortfolioSchema = new mongoose.Schema({
   personalInfo: {
     fullName: { type: String, default: '' },
     tagline: { type: String, default: '' },
+    primaryDomain: { type: String, default: '' },
     location: { type: String, default: '' },
     showEmail: { type: Boolean, default: false },
     bio: { type: String, default: '' },

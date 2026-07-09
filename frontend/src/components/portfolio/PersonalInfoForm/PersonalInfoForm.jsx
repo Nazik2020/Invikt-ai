@@ -67,7 +67,18 @@ const PersonalInfoForm = () => {
               name="tagline"
               value={personalInfo.tagline}
               onChange={handleChange}
-              placeholder="e.g. AI Architecture & UX Engineer" 
+              placeholder="e.g. Data Scientist" 
+              className="w-full bg-[#1e1f23] border border-white/10 rounded-md px-4 py-3 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Primary Domain (Small Subtitle)</label>
+            <input 
+              type="text" 
+              name="primaryDomain"
+              value={personalInfo.primaryDomain || ''}
+              onChange={handleChange}
+              placeholder="e.g. MACHINE LEARNING & AI • DATA ENGINEERING" 
               className="w-full bg-[#1e1f23] border border-white/10 rounded-md px-4 py-3 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
             />
           </div>
