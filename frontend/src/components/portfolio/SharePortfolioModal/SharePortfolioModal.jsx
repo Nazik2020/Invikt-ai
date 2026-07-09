@@ -5,7 +5,7 @@ const SharePortfolioModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-[#0f1115]/80 backdrop-blur-sm transition-opacity animate-fade-in"
@@ -13,10 +13,10 @@ const SharePortfolioModal = ({ isOpen, onClose }) => {
       />
       
       {/* Modal Container */}
-      <div className="relative w-full max-w-[800px] bg-[#16181d] border border-white/10 rounded-3xl p-8 shadow-2xl animate-fade-in-up">
+      <div className="relative w-full max-w-[800px] max-h-[100%] overflow-y-auto bg-[#16181d] border border-white/10 rounded-[1.5rem] p-5 sm:p-8 shadow-2xl animate-fade-in-up">
         
         {/* Header */}
-        <div className="flex justify-between items-start mb-6">
+        <div className="flex justify-between items-start mb-5 sm:mb-6">
           <div>
             <h2 className="text-[1.1rem] font-sans font-bold text-white mb-0.5">Share Your Portfolio</h2>
             <p className="text-[0.85rem] text-gray-400">Let the world see what you can do.</p>
@@ -68,16 +68,16 @@ const SharePortfolioModal = ({ isOpen, onClose }) => {
             </div>
 
             {/* Stats */}
-            <div className="flex flex-wrap gap-2 mt-1">
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/5 text-[0.7rem] font-medium text-gray-300">
+            <div className="flex flex-wrap gap-2 mt-2">
+              <div className="flex items-center gap-1 px-2.5 py-1.5 sm:py-1 rounded-full bg-white/5 border border-white/5 text-[0.65rem] sm:text-[0.7rem] font-medium text-gray-300 whitespace-nowrap flex-1 justify-center sm:flex-none sm:justify-start">
                 <span className="material-symbols-outlined text-[14px]">visibility</span>
                 47 total views
               </div>
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/5 text-[0.7rem] font-medium text-gray-300">
+              <div className="flex items-center gap-1 px-2.5 py-1.5 sm:py-1 rounded-full bg-white/5 border border-white/5 text-[0.65rem] sm:text-[0.7rem] font-medium text-gray-300 whitespace-nowrap flex-1 justify-center sm:flex-none sm:justify-start">
                 <span className="material-symbols-outlined text-[14px]">ads_click</span>
                 8 link clicks
               </div>
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[0.7rem] font-bold text-cyan-400">
+              <div className="flex items-center gap-1 px-2.5 py-1.5 sm:py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[0.65rem] sm:text-[0.7rem] font-bold text-cyan-400 whitespace-nowrap flex-1 justify-center sm:flex-none sm:justify-start">
                 <span className="material-symbols-outlined text-[14px]">trending_up</span>
                 12 this week
               </div>
@@ -86,32 +86,32 @@ const SharePortfolioModal = ({ isOpen, onClose }) => {
           </div>
 
           {/* Right Column */}
-          <div className="flex-1">
+          <div className="flex-1 mt-2 md:mt-0">
             <h4 className="text-[0.65rem] font-bold text-gray-400 uppercase tracking-wider mb-3">Share on Platforms</h4>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
               
               {/* LinkedIn */}
-              <button className="flex flex-col items-center justify-center gap-1.5 h-20 bg-[#0a66c2]/10 hover:bg-[#0a66c2]/20 border border-[#0a66c2]/30 rounded-xl transition-colors">
-                <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" className="w-6 h-6 opacity-90" />
-                <span className="text-[0.7rem] font-bold text-white">LinkedIn</span>
+              <button className="flex flex-col items-center justify-center gap-1.5 h-16 sm:h-20 bg-[#0a66c2]/10 hover:bg-[#0a66c2]/20 border border-[#0a66c2]/30 rounded-xl transition-colors">
+                <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" className="w-5 h-5 sm:w-6 sm:h-6 opacity-90" />
+                <span className="text-[0.65rem] sm:text-[0.7rem] font-bold text-white">LinkedIn</span>
               </button>
               
               {/* WhatsApp */}
-              <button className="flex flex-col items-center justify-center gap-1.5 h-20 bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 rounded-xl transition-colors">
-                <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp" className="w-6 h-6 opacity-90" />
-                <span className="text-[0.7rem] font-bold text-white">WhatsApp</span>
+              <button className="flex flex-col items-center justify-center gap-1.5 h-16 sm:h-20 bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 rounded-xl transition-colors">
+                <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp" className="w-5 h-5 sm:w-6 sm:h-6 opacity-90" />
+                <span className="text-[0.65rem] sm:text-[0.7rem] font-bold text-white">WhatsApp</span>
               </button>
 
               {/* X / Twitter */}
-              <button className="flex flex-col items-center justify-center gap-1.5 h-20 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors">
-                <span className="material-symbols-outlined text-white text-[24px]">close</span>
-                <span className="text-[0.7rem] font-bold text-white">Share on X</span>
+              <button className="flex flex-col items-center justify-center gap-1.5 h-16 sm:h-20 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors">
+                <span className="material-symbols-outlined text-white text-[20px] sm:text-[24px]">close</span>
+                <span className="text-[0.65rem] sm:text-[0.7rem] font-bold text-white">Share on X</span>
               </button>
 
               {/* Email */}
-              <button className="flex flex-col items-center justify-center gap-1.5 h-20 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors">
-                <span className="material-symbols-outlined text-white text-[24px]">mail</span>
-                <span className="text-[0.7rem] font-bold text-white">Send via Email</span>
+              <button className="flex flex-col items-center justify-center gap-1.5 h-16 sm:h-20 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors">
+                <span className="material-symbols-outlined text-white text-[20px] sm:text-[24px]">mail</span>
+                <span className="text-[0.65rem] sm:text-[0.7rem] font-bold text-white">Send via Email</span>
               </button>
 
             </div>
@@ -120,18 +120,18 @@ const SharePortfolioModal = ({ isOpen, onClose }) => {
         </div>
 
         {/* Bottom Section: QR Code */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-5">
-          <div className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-5">
-            <div className="w-[88px] h-[88px] bg-white rounded-2xl p-2.5 shrink-0 shadow-sm flex items-center justify-center">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-5 mt-2">
+          <div className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-4 sm:gap-5">
+            <div className="w-[72px] h-[72px] sm:w-[88px] sm:h-[88px] bg-white rounded-2xl p-2 sm:p-2.5 shrink-0 shadow-sm flex items-center justify-center">
               <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://invikt.com/p/nazik" alt="QR Code" className="w-full h-full object-contain" />
             </div>
             <div className="flex flex-col items-center sm:items-start">
               <h4 className="text-[0.9rem] font-bold text-white mb-0.5">QR Code</h4>
-              <p className="text-[0.75rem] text-gray-400 mb-2 max-w-[200px] leading-snug">
+              <p className="text-[0.75rem] text-gray-400 mb-2 max-w-[240px] leading-snug">
                 Print this on your resume or business card for quick access.
               </p>
-              <button className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-white/20 hover:bg-white/5 text-white text-[0.7rem] font-bold transition-colors">
-                <span className="material-symbols-outlined text-[14px]">download</span>
+              <button className="flex items-center gap-1.5 px-4 py-1.5 sm:px-3 sm:py-1 rounded-full border border-white/20 hover:bg-white/5 text-white text-[0.75rem] sm:text-[0.7rem] font-bold transition-colors">
+                <span className="material-symbols-outlined text-[16px] sm:text-[14px]">download</span>
                 Download QR
               </button>
             </div>
@@ -139,7 +139,7 @@ const SharePortfolioModal = ({ isOpen, onClose }) => {
 
           <button 
             onClick={onClose}
-            className="w-full md:w-auto px-6 py-2 rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white text-[0.9rem] font-bold shadow-[0_0_20px_rgba(34,211,238,0.4)] transition-all transform hover:scale-105"
+            className="w-full md:w-auto px-8 py-3 sm:px-6 sm:py-2 rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white text-[0.95rem] sm:text-[0.9rem] font-bold shadow-[0_0_20px_rgba(34,211,238,0.4)] transition-all transform hover:scale-105 mt-2 md:mt-0"
           >
             Done
           </button>

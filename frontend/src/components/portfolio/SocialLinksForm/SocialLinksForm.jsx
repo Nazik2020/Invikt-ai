@@ -1,8 +1,19 @@
 import React from "react";
+import { usePortfolio } from "../../../context/PortfolioContext";
 
 const SocialLinksForm = () => {
+  const { portfolioData, updateSection } = usePortfolio();
+  const { socialLinks } = portfolioData;
+
+  const handleChange = (e) => {
+    updateSection("socialLinks", {
+      ...socialLinks,
+      [e.target.name]: e.target.value
+    });
+  };
+
   return (
-    <div className="bg-[#17181c] border border-white/5 rounded-[24px] p-6 sm:p-8 flex flex-col gap-6">
+    <div className="bg-[#17181c] border border-white/5 rounded-2xl p-6 sm:p-8 flex flex-col gap-6">
       <div className="flex items-center gap-3 border-b border-white/5 pb-4">
         <span className="material-symbols-outlined text-white/60">share</span>
         <h3 className="text-[1.1rem] font-bold text-white">Social Links</h3>
@@ -16,8 +27,11 @@ const SocialLinksForm = () => {
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-white/40">code</span>
             <input 
               type="url" 
+              name="github"
+              value={socialLinks.github}
+              onChange={handleChange}
               placeholder="https://github.com/..." 
-              className="w-full bg-[#1e1f23] border border-white/10 rounded-lg pl-11 pr-4 py-3 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
+              className="w-full bg-[#1e1f23] border border-white/10 rounded-md pl-11 pr-4 py-3 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
             />
           </div>
         </div>
@@ -29,8 +43,11 @@ const SocialLinksForm = () => {
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-white/40">work</span>
             <input 
               type="url" 
+              name="linkedin"
+              value={socialLinks.linkedin}
+              onChange={handleChange}
               placeholder="https://linkedin.com/in/..." 
-              className="w-full bg-[#1e1f23] border border-white/10 rounded-lg pl-11 pr-4 py-3 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
+              className="w-full bg-[#1e1f23] border border-white/10 rounded-md pl-11 pr-4 py-3 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
             />
           </div>
         </div>
@@ -42,8 +59,11 @@ const SocialLinksForm = () => {
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-white/40">tag</span>
             <input 
               type="url" 
+              name="twitter"
+              value={socialLinks.twitter}
+              onChange={handleChange}
               placeholder="https://x.com/..." 
-              className="w-full bg-[#1e1f23] border border-white/10 rounded-lg pl-11 pr-4 py-3 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
+              className="w-full bg-[#1e1f23] border border-white/10 rounded-md pl-11 pr-4 py-3 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
             />
           </div>
         </div>
@@ -55,18 +75,14 @@ const SocialLinksForm = () => {
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[18px] text-white/40">language</span>
             <input 
               type="url" 
+              name="website"
+              value={socialLinks.website}
+              onChange={handleChange}
               placeholder="https://..." 
-              className="w-full bg-[#1e1f23] border border-white/10 rounded-lg pl-11 pr-4 py-3 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
+              className="w-full bg-[#1e1f23] border border-white/10 rounded-md pl-11 pr-4 py-3 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
             />
           </div>
         </div>
-      </div>
-      
-      <div className="pt-2">
-        <button className="flex items-center gap-2 text-[0.75rem] font-bold text-violet-400 hover:text-violet-300 transition-colors uppercase tracking-wide">
-          <span className="material-symbols-outlined text-[18px]">add</span>
-          Add Custom Link
-        </button>
       </div>
     </div>
   );

@@ -41,10 +41,12 @@ app.use(express.json({ limit: "10mb" }));
 // ─── Route Imports ────────────────────────────────────────────────────────────
 const authRoutes = require("./routes/auth/authRoutes");
 const jobRoutes  = require("./routes/jobs/jobRoutes");
+const portfolioRoutes = require("./routes/portfolioRoutes");
 
 // ─── Mount Routes ─────────────────────────────────────────────────────────────
 app.use("/api/auth", authLimiter, authRoutes); // Auth routes (with strict limiter)
 app.use("/api/jobs", jobRoutes);               // Job Tracker routes
+app.use("/api/portfolio", portfolioRoutes);    // Portfolio Builder routes
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get("/", (req, res) => {
