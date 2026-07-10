@@ -292,7 +292,7 @@ const DashboardPage = () => {
                 <div key={idx} className="relative group">
                   {/* Icon Indicator dot */}
                   <div
-                    className={`absolute -left-[34px] top-1 w-6 h-6 rounded-full border-2 flex items-center justify-center bg-white dark:bg-[#17181c] z-10 transition-all duration-300
+                    className={`absolute -left-[32px] top-1 w-6 h-6 rounded-full border-2 flex items-center justify-center bg-white dark:bg-[#17181c] z-10 transition-all duration-300
                                         ${isCompleted ? "bg-violet-600 border-violet-600 text-white shadow-[0_0_10px_rgba(93,33,223,0.3)]" : ""}
                                         ${isActive ? "border-violet-500 shadow-[0_0_8px_rgba(93,33,223,0.2)]" : ""}
                                         ${isLocked ? "border-slate-200 dark:border-white/10 text-slate-400 dark:text-white/20" : ""}
@@ -422,8 +422,8 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      {/* ── Bottom Quick Actions Row (3 Columns) ── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      {/* ── Bottom Quick Actions Row (4 Columns) ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <div
           onClick={() => navigate("/job-tracker")}
           className="p-5 rounded-2xl bg-white dark:bg-[#1e1f23]/40 border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none hover:border-slate-200 dark:border-white/10 hover:shadow hover:bg-slate-50 dark:hover:bg-[#24252a]/50 cursor-pointer flex gap-4 items-center transition-all group"
@@ -435,10 +435,10 @@ const DashboardPage = () => {
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-bold text-slate-900 dark:text-white/90 group-hover:text-slate-900 dark:text-white transition-colors">
-              Add New Application
+              Add Application
             </span>
             <span className="text-[0.7rem] text-slate-400 dark:text-white/30 font-medium">
-              Track another opportunity
+              Track new job
             </span>
           </div>
         </div>
@@ -457,7 +457,7 @@ const DashboardPage = () => {
               Continue Roadmap
             </span>
             <span className="text-[0.7rem] text-slate-400 dark:text-white/30 font-medium">
-              Resume where you left off
+              Resume your path
             </span>
           </div>
         </div>
@@ -473,10 +473,29 @@ const DashboardPage = () => {
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-bold text-slate-900 dark:text-white/90 group-hover:text-slate-900 dark:text-white transition-colors">
-              Explore Career Paths
+              Explore Paths
             </span>
             <span className="text-[0.7rem] text-slate-400 dark:text-white/30 font-medium">
-              Discover new roadmaps
+              Find new skills
+            </span>
+          </div>
+        </div>
+
+        <div
+          onClick={() => navigate("/portfolio")}
+          className="p-5 rounded-2xl bg-white dark:bg-[#1e1f23]/40 border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none hover:border-slate-200 dark:border-white/10 hover:shadow hover:bg-slate-50 dark:hover:bg-[#24252a]/50 cursor-pointer flex gap-4 items-center transition-all group"
+        >
+          <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/8 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+            <span className="material-symbols-outlined text-[18px] text-slate-600 dark:text-white/60">
+              language
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-bold text-slate-900 dark:text-white/90 group-hover:text-slate-900 dark:text-white transition-colors">
+              Manage Portfolio
+            </span>
+            <span className="text-[0.7rem] text-slate-400 dark:text-white/30 font-medium">
+              Update your site
             </span>
           </div>
         </div>
