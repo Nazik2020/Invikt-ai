@@ -70,7 +70,7 @@ const getDashboardOverview = async (req, res) => {
           {
             title: "In Progress",
             value: inProgressCount.toString(),
-            subtext: "Active interviews",
+            subtext: "Active applications",
             type: "segments",
             activeCount: inProgressCount,
             totalCount: 3,

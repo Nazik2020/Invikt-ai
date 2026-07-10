@@ -112,7 +112,7 @@ const DashboardPage = () => {
                 </span>
                 {m.subtext && (
                   <span
-                    className={`text-[0.75rem] font-bold ${m.subtext.startsWith("+") ? "text-emerald-400" : m.subtext.includes("Neutral") ? "text-slate-500 dark:text-white/40" : "text-rose-400"}`}
+                    className={`text-[0.75rem] font-bold ${m.subtext.startsWith("+") ? "text-emerald-400" : m.subtext.includes("Neutral") ? "text-slate-500 dark:text-white/40" : "text-violet-500 dark:text-violet-300"}`}
                   >
                     {m.subtext}
                   </span>
