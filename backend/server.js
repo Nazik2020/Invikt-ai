@@ -44,6 +44,7 @@ const jobRoutes  = require("./routes/jobs/jobRoutes");
 const portfolioRoutes = require("./routes/portfolioRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
 const portfolioShareRoutes = require("./routes/share/portfolioShareRoutes");
+const dashboardRoutes = require("./routes/dashboard/dashboardRoutes");
 
 // ─── Mount Routes ─────────────────────────────────────────────────────────────
 app.use("/api/auth", authLimiter, authRoutes); // Auth routes (with strict limiter)
@@ -51,6 +52,7 @@ app.use("/api/jobs", jobRoutes);               // Job Tracker routes
 app.use("/api/portfolio", portfolioRoutes);    // Portfolio Builder routes
 app.use("/api/upload", uploadRoutes);          // File upload routes
 app.use("/api/portfolio/share", portfolioShareRoutes); // Portfolio Sharing & Analytics routes
+app.use("/api/dashboard", dashboardRoutes);    // Dashboard metrics
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get("/", (req, res) => {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -9,92 +9,43 @@ const DashboardPage = () => {
   const rawUsername = user?.username || "User";
   const displayName = rawUsername.charAt(0).toUpperCase() + rawUsername.slice(1);
 
-  // Mock data based on screenshot
-  const metrics = [
-    {
-      title: "Applications Sent",
-      value: "24",
-      subtext: "+12% this week",
-      type: "progress",
-      progress: 65,
-      color: "from-violet-500 to-cyan-400",
-    },
-    {
-      title: "In Progress",
-      value: "3",
-      subtext: "Active interviews",
-      type: "segments",
-      activeCount: 2,
-      totalCount: 3,
-    },
-    {
-      title: "Skills Learned",
-      value: "68%",
-      type: "radial",
-      percentage: 68,
-    },
-    {
-      title: "Response Rate",
-      value: "12%",
-      subtext: "0% (Neutral)",
-      type: "bars",
-      bars: [25, 45, 15, 60, 35],
-    },
-  ];
+  const { getAuthHeaders } = useAuth();
+  const [metrics, setMetrics] = useState([]);
+  const [activeRoadmap, setActiveRoadmap] = useState(null);
+  const [recentApplications, setRecentApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const activeRoadmap = {
-    title: "Frontend Developer",
-    skillsValidated: "5/12",
-    stages: [
-      {
-        title: "Foundations",
-        desc: "HTML5, CSS3, Semantic Web & Accessibility",
-        status: "completed",
-        badge: "COMPLETED",
-      },
-      {
-        title: "JS Mastery",
-        desc: "ES6+, Asynchronous Patterns & API Integration",
-        status: "active",
-        badge: "IN PROGRESS",
-        progress: 42,
-      },
-      {
-        title: "React Ecosystem",
-        desc: "Hooks, State Management & Modern Frameworks",
-        status: "locked",
-        badge: "UP NEXT",
-      },
-    ],
-  };
+  React.useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/dashboard`, {
+          headers: getAuthHeaders(),
+        });
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+          setMetrics(data.data.metrics);
+          setActiveRoadmap(data.data.activeRoadmap);
+          setRecentApplications(data.data.recentApplications);
+        }
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDashboardData();
+  }, [getAuthHeaders]);
 
-  const recentApplications = [
-    {
-      company: "Google",
-      role: "UX Engineer",
-      status: "INTERVIEW",
-      color: "text-cyan-400 bg-cyan-400/10 border-cyan-400/20",
-    },
-    {
-      company: "Stripe",
-      role: "Frontend Dev",
-      status: "APPLIED",
-      color:
-        "text-slate-600 dark:text-white/60 bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10",
-    },
-    {
-      company: "Vercel",
-      role: "Core Team",
-      status: "REJECTED",
-      color: "text-rose-400 bg-rose-400/10 border-rose-400/20",
-    },
-    {
-      company: "Meta",
-      role: "Senior Web Dev",
-      status: "OFFER",
-      color: "text-violet-400 bg-violet-400/10 border-violet-400/20",
-    },
-  ];
+  if (loading) {
+    return (
+      <div className="w-full h-96 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-500"></div>
+      </div>
+    );
+  }
+
+  if (!activeRoadmap) return null;
 
   return (
     <div className="w-full space-y-8">
