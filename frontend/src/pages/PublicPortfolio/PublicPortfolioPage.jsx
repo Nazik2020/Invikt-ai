@@ -41,21 +41,27 @@ const PublicPortfolioPage = () => {
     }
   }, [username]);
 
-  if (loading) {
-    return <div className="min-h-screen bg-[#0d0e12] flex items-center justify-center text-white font-bold">Loading Portfolio...</div>;
-  }
-
-  if (error || !portfolioData) {
-    return (
-      <div className="min-h-screen bg-[#0d0e12] flex flex-col items-center justify-center text-white">
-        <span className="material-symbols-outlined text-[48px] text-white/20 mb-4">sentiment_dissatisfied</span>
-        <h1 className="text-2xl font-bold">Portfolio Not Found</h1>
-        <p className="text-white/40 mt-2">The requested portfolio does not exist or has not been published.</p>
-      </div>
-    );
-  }
-
-  const { socialLinks, personalInfo } = portfolioData;
+  // Hook 2: Record view. Must be top-level before early returns!
+  useEffect(() => {
+    const recordView = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const headers = { "Content-Type": "application/json" };
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+        await fetch(`${API_URL}/portfolio/share/record-view/${username}`, {
+          method: "POST",
+          headers
+        });
+      } catch (err) {
+        console.error("Failed to record view", err);
+      }
+    };
+    if (portfolioData) {
+      recordView();
+    }
+  }, [username, portfolioData]);
 
   const recordClick = async () => {
     try {
@@ -77,26 +83,21 @@ const PublicPortfolioPage = () => {
     recordClick();
   };
 
-  useEffect(() => {
-    const recordView = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const headers = { "Content-Type": "application/json" };
-        if (token) {
-          headers["Authorization"] = `Bearer ${token}`;
-        }
-        await fetch(`${API_URL}/portfolio/share/record-view/${username}`, {
-          method: "POST",
-          headers
-        });
-      } catch (err) {
-        console.error("Failed to record view", err);
-      }
-    };
-    if (portfolioData) {
-      recordView();
-    }
-  }, [username, portfolioData]);
+  if (loading) {
+    return <div className="min-h-screen bg-[#0d0e12] flex items-center justify-center text-white font-bold">Loading Portfolio...</div>;
+  }
+
+  if (error || !portfolioData) {
+    return (
+      <div className="min-h-screen bg-[#0d0e12] flex flex-col items-center justify-center text-white">
+        <span className="material-symbols-outlined text-[48px] text-white/20 mb-4">sentiment_dissatisfied</span>
+        <h1 className="text-2xl font-bold">Portfolio Not Found</h1>
+        <p className="text-white/40 mt-2">The requested portfolio does not exist or has not been published.</p>
+      </div>
+    );
+  }
+
+  const { socialLinks, personalInfo } = portfolioData;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0d0e12] text-gray-900 dark:text-white font-sans selection:bg-violet-500/30 selection:text-violet-900 dark:selection:text-violet-200 relative overflow-x-hidden transition-colors duration-300 pt-20">
