@@ -83,14 +83,8 @@ const LivePreview = () => {
                 )}
               </div>
               
-              {/* Glassmorphic overlay card (Bar chart) and Resume badge */}
+              {/* Glassmorphic overlay card (Resume badge only) */}
               <div className="absolute -bottom-6 right-2 z-20 flex flex-col items-end animate-[float_6s_ease-in-out_infinite]">
-                {/* Bar Chart Card (Highly transparent glassmorphism matching mockup) */}
-                <div className="w-[85px] h-[110px] flex items-end justify-center gap-1.5 p-2 pb-3 relative z-10 rounded-xl" style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.09)', backdropFilter: 'blur(12px)', boxShadow: '0 15px 30px rgba(0,0,0,0.4)', transform: 'rotate(-6deg)' }}>
-                  <div className="w-2.5 h-7 bg-[#7a8099]/30 rounded-sm"></div>
-                  <div className="w-2.5 h-16 bg-[#9061f9]/70 rounded-sm shadow-[0_0_15px_rgba(144,97,249,0.25)]"></div>
-                  <div className="w-2.5 h-11 bg-[#ec4899]/20 rounded-sm"></div>
-                </div>
                 
                 {portfolioData.personalInfo.showResume && portfolioData.personalInfo.resumeUrl && (
                   <a href={portfolioData.personalInfo.resumeUrl} target="_blank" rel="noreferrer" className="absolute bottom-0.5 -right-7 flex items-center gap-1 cursor-pointer group z-20 drop-shadow-2xl">

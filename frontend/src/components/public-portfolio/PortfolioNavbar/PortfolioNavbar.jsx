@@ -5,6 +5,7 @@ const PortfolioNavbar = ({ data }) => {
   const [isDarkMode, setIsDarkMode] = useState(
     document.documentElement.classList.contains("dark") || true
   );
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -23,7 +24,7 @@ const PortfolioNavbar = ({ data }) => {
 
   return (
     <header className="fixed top-0 left-0 w-full bg-white/90 dark:bg-[#0d0e12]/90 backdrop-blur-md border-b border-gray-200 dark:border-white/5 z-[100] transition-colors">
-      <div className="max-w-[1400px] mx-auto px-6 h-20 flex items-center justify-between">
+      <div className="max-w-[1400px] mx-auto px-6 h-20 flex items-center justify-between relative">
         
         {/* Left: Branding */}
         <div className="flex items-center gap-2 font-sans text-[1.1rem]">
@@ -32,13 +33,16 @@ const PortfolioNavbar = ({ data }) => {
           <span className="text-gray-800 dark:text-white font-semibold tracking-wide">{firstName}</span>
         </div>
 
-        {/* Right: Navigation & Actions */}
+        {/* Right: Navigation & Actions (Desktop) */}
         <nav className="hidden lg:flex items-center gap-8">
           <div className="flex items-center gap-6">
             <a href="#home" className="text-[0.85rem] font-semibold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Home</a>
             <a href="#projects" className="text-[0.85rem] font-semibold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Projects</a>
             <a href="#certifications" className="text-[0.85rem] font-semibold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Certifications</a>
             <a href="#contact" className="text-[0.85rem] font-semibold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Contact</a>
+            {data?.showResume && data?.resumeUrl && (
+              <a href={data.resumeUrl} target="_blank" rel="noreferrer" className="text-[0.85rem] font-semibold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Resume</a>
+            )}
           </div>
           
           <div className="w-[1px] h-6 bg-gray-300 dark:bg-white/10"></div>
@@ -56,6 +60,43 @@ const PortfolioNavbar = ({ data }) => {
             Create Your Portfolio Free
           </Link>
         </nav>
+
+        {/* Mobile Hamburger Menu Icon */}
+        <div className="lg:hidden flex items-center gap-4">
+          <button 
+            onClick={toggleTheme}
+            className="w-9 h-9 rounded-full flex items-center justify-center bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors text-gray-600 dark:text-gray-400 dark:hover:text-white"
+          >
+            <span className="material-symbols-outlined text-[18px]">
+              {isDarkMode ? "light_mode" : "dark_mode"}
+            </span>
+          </button>
+          <button 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="text-gray-600 dark:text-gray-300 hover:text-violet-500 transition-colors"
+          >
+            <span className="material-symbols-outlined text-[28px]">
+              {isMobileMenuOpen ? "close" : "menu"}
+            </span>
+          </button>
+        </div>
+
+        {/* Mobile Dropdown Menu */}
+        {isMobileMenuOpen && (
+          <div className="absolute top-[80px] right-6 w-56 bg-white dark:bg-[#16171b] border border-gray-200 dark:border-white/10 rounded-xl shadow-2xl flex flex-col p-2 z-50 lg:hidden animate-fade-in">
+            <a href="#home" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 text-[0.9rem] font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">Home</a>
+            <a href="#projects" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 text-[0.9rem] font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">Projects</a>
+            <a href="#certifications" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 text-[0.9rem] font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">Certifications</a>
+            <a href="#contact" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 text-[0.9rem] font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">Contact Me</a>
+            {data?.showResume && data?.resumeUrl && (
+              <a href={data.resumeUrl} target="_blank" rel="noreferrer" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 text-[0.9rem] font-semibold text-violet-600 dark:text-violet-400 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">Resume</a>
+            )}
+            <div className="h-[1px] w-full bg-gray-200 dark:bg-white/10 my-2"></div>
+            <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 text-[0.9rem] font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-violet-600 hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition-colors">
+              Create Your Portfolio
+            </Link>
+          </div>
+        )}
       </div>
     </header>
   );

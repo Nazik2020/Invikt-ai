@@ -1,10 +1,12 @@
 import React from "react";
 import { usePortfolio } from "../../../context/PortfolioContext";
+import { useAuth } from "../../../context/AuthContext";
 import { API_URL } from "../../../config/api";
 
 const PersonalInfoForm = () => {
   const { portfolioData, updateSection } = usePortfolio();
   const { personalInfo } = portfolioData;
+  const { token } = useAuth();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -22,10 +24,6 @@ const PersonalInfoForm = () => {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('container', 'profile-photos'); // specify container
-
-      // Assuming API_URL is accessible here. We should import it.
-      // Wait, let's import it at the top.
-      const token = localStorage.getItem('invikt_token') || localStorage.getItem('token');
       
       const res = await fetch(`${API_URL}/upload`, {
         method: 'POST',
@@ -56,8 +54,6 @@ const PersonalInfoForm = () => {
       formData.append('file', file);
       // We will store it in the portfolio-images container (so it is public and anyone can download the resume)
       formData.append('container', 'portfolio-images'); 
-
-      const token = localStorage.getItem('invikt_token') || localStorage.getItem('token');
       
       const res = await fetch(`${API_URL}/upload`, {
         method: 'POST',

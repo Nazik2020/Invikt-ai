@@ -63,8 +63,8 @@ const TechnologiesForm = () => {
       </div>
 
       <div className="flex flex-col gap-8">
-        {categories.map((category) => (
-          <div key={category.id} className="relative p-6 rounded-lg border border-white/10 bg-[#1e1f23] flex flex-col gap-6">
+        {categories.map((category, index) => (
+          <div key={category._id || category.id || index} className="relative p-6 rounded-lg border border-white/10 bg-[#1e1f23] flex flex-col gap-6">
             {categories.length > 1 && (
               <button 
                 onClick={() => removeCategory(category.id)}
@@ -97,8 +97,8 @@ const TechnologiesForm = () => {
                 </button>
               </div>
 
-              {category.tools.map((tool) => (
-                <div key={tool.id} className="flex flex-col sm:flex-row gap-4 items-start sm:items-center relative bg-[#17181c] p-3 rounded-md border border-white/5">
+              {category.tools.map((tool, tIdx) => (
+                <div key={tool._id || tool.id || tIdx} className="flex flex-col sm:flex-row gap-4 items-start sm:items-center relative bg-[#17181c] p-3 rounded-md border border-white/5">
                   <div className="flex-1 w-full space-y-1.5">
                     <label className="text-[0.55rem] font-black text-white/30 uppercase tracking-widest">Tool Name</label>
                     <input 

@@ -78,7 +78,7 @@ const PortfolioHero = ({ data, onLinkClick }) => {
         {/* Glassmorphic overlay card (Bar chart) and Resume Badge */}
         <div className="absolute -bottom-6 -right-4 lg:-bottom-8 lg:right-6 z-20 flex flex-col items-end animate-[float_6s_ease-in-out_infinite]">
           {/* Bar Chart Card (Highly transparent glassmorphism matching mockup) */}
-          <div className="w-[145px] h-[175px] lg:w-[180px] lg:h-[220px] flex items-end justify-center gap-3 lg:gap-4 p-4 lg:p-5 pb-5 lg:pb-6 transition-all relative z-10 rounded-[1.5rem]" style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.09)', backdropFilter: 'blur(24px)', boxShadow: '0 30px 60px rgba(0,0,0,0.4)', transform: 'rotate(-6deg)' }}>
+          <div className="hidden lg:flex w-[145px] h-[175px] lg:w-[180px] lg:h-[220px] items-end justify-center gap-3 lg:gap-4 p-4 lg:p-5 pb-5 lg:pb-6 transition-all relative z-10 rounded-[1.5rem]" style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.09)', backdropFilter: 'blur(24px)', boxShadow: '0 30px 60px rgba(0,0,0,0.4)', transform: 'rotate(-6deg)' }}>
             <div className="w-5 lg:w-6 h-12 lg:h-[65px] bg-[#7a8099]/30 rounded-sm"></div>
             <div className="w-5 lg:w-6 h-28 lg:h-[135px] bg-[#9061f9]/70 rounded-sm shadow-[0_0_20px_rgba(144,97,249,0.25)]"></div>
             <div className="w-5 lg:w-6 h-20 lg:h-[95px] bg-[#ec4899]/20 rounded-sm"></div>

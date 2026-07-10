@@ -34,7 +34,7 @@ const ExperienceForm = () => {
 
       <div className="flex flex-col gap-6">
         {items.map((item, index) => (
-          <div key={item.id} className="relative p-6 rounded-lg border border-white/10 bg-[#1e1f23] flex flex-col gap-4">
+          <div key={item._id || item.id || index} className="relative p-6 rounded-lg border border-white/10 bg-[#1e1f23] flex flex-col gap-4">
             {items.length > 1 && (
               <button 
                 onClick={() => removeItem(item.id)}
