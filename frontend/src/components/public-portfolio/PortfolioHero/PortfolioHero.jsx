@@ -84,17 +84,17 @@ const PortfolioHero = ({ data, onLinkClick }) => {
             <div className="w-5 lg:w-7 h-20 lg:h-[95px] bg-[#ec4899]/20 rounded-sm"></div>
           </div>
 
-          {/* Resume Badge (Static, shifted right to be fully visible and overlap the front right side) */}
+          {/* Resume Badge (Fixed to viewport so it stays when scrolling) */}
           {data.personalInfo.showResume && data.personalInfo.resumeUrl && (
-            <a href={data.personalInfo.resumeUrl} onClick={onLinkClick} target="_blank" rel="noreferrer" className="hidden lg:flex absolute bottom-2 -right-8 lg:bottom-4 lg:-right-6 items-center gap-2 cursor-pointer group z-50 drop-shadow-2xl hover:scale-105 transition-all">
-              <svg className="w-9 h-9 lg:w-11 lg:h-11 text-violet-200 group-hover:text-violet-300 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
+            <a href={data.personalInfo.resumeUrl} onClick={onLinkClick} target="_blank" rel="noreferrer" className="hidden lg:flex fixed bottom-8 right-8 lg:bottom-12 lg:right-12 items-center gap-2 cursor-pointer group z-50 drop-shadow-2xl hover:scale-105 transition-all bg-[#0d0e12]/60 backdrop-blur-md px-4 py-3 rounded-full border border-white/10 hover:border-violet-500/50 hover:bg-[#0d0e12]/80">
+              <svg className="w-6 h-6 lg:w-7 lg:h-7 text-violet-200 group-hover:text-violet-300 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                 <polyline points="14 2 14 8 20 8" />
                 <line x1="16" y1="13" x2="8" y2="13" />
                 <line x1="16" y1="17" x2="8" y2="17" />
                 <line x1="10" y1="9" x2="8" y2="9" />
               </svg>
-              <span className="text-[0.75rem] lg:text-[0.8rem] font-bold tracking-[0.3em] text-[#e9d5ff] uppercase group-hover:text-[#d8b4fe] transition-colors drop-shadow-lg mb-0.5">Resume</span>
+              <span className="text-[0.7rem] lg:text-[0.8rem] font-bold tracking-[0.25em] text-[#e9d5ff] uppercase group-hover:text-[#d8b4fe] transition-colors drop-shadow-lg mb-0.5">Resume</span>
             </a>
           )}
         </div>
