@@ -10,6 +10,7 @@ const PersonalInfoForm = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    if (name === "bio" && value.length > 300) return;
     updateSection("personalInfo", {
       ...personalInfo,
       [name]: type === "checkbox" ? checked : value,
@@ -169,7 +170,7 @@ const PersonalInfoForm = () => {
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
           <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Short Bio</label>
-          <span className="text-[0.6rem] font-bold text-white/30">0 / 300</span>
+          <span className="text-[0.6rem] font-bold text-white/30">{(personalInfo.bio || "").length} / 300</span>
         </div>
         <textarea 
           name="bio"

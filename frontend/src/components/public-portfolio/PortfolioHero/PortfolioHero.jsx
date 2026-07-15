@@ -4,8 +4,9 @@ const PortfolioHero = ({ data, onLinkClick }) => {
   if (!data || !data.personalInfo) return null;
   const { fullName, tagline, bio, avatarUrl } = data.personalInfo;
   
-  // Split name for stylistic rendering if possible
-  const nameParts = fullName ? fullName.split(' ') : [''];
+  // Split name for stylistic rendering if possible (remove any trailing comma first)
+  const cleanFullName = fullName ? fullName.trim().replace(/,$/, '') : '';
+  const nameParts = cleanFullName ? cleanFullName.split(' ') : [''];
   const firstName = nameParts[0];
   const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
 
@@ -17,10 +18,10 @@ const PortfolioHero = ({ data, onLinkClick }) => {
         <p className="text-[0.75rem] font-bold tracking-[0.25em] text-gray-400 uppercase mb-6">
           {data.personalInfo.primaryDomain || "PORTFOLIO"}
         </p>
-        <h1 className="text-[3.5rem] lg:text-[4.5rem] leading-[1.05] font-sans font-black tracking-tight text-gray-900 dark:text-white mb-0 transition-colors uppercase">
-          {firstName}<br/>{lastName}{lastName && ','}
+        <h1 className="text-[2.5rem] sm:text-[3.5rem] lg:text-[4.5rem] leading-[1.05] font-sans font-black tracking-tight text-gray-900 dark:text-white mb-0 transition-colors uppercase">
+          {firstName}<br/>{lastName}
         </h1>
-        <h1 className="text-[3rem] lg:text-[4rem] xl:text-[4.5rem] leading-[1.1] font-sans font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-violet-300 to-violet-500 mb-8 drop-shadow-[0_0_15px_rgba(167,139,250,0.4)] whitespace-nowrap uppercase">
+        <h1 className="text-[1.8rem] sm:text-[3rem] lg:text-[4rem] xl:text-[4.5rem] leading-[1.1] font-sans font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-violet-300 to-violet-500 mb-8 drop-shadow-[0_0_15px_rgba(167,139,250,0.4)] sm:whitespace-nowrap uppercase">
           {tagline}
         </h1>
         <p className="text-[0.95rem] leading-relaxed text-gray-600 dark:text-gray-400 mb-10 font-normal transition-colors whitespace-pre-wrap">
@@ -38,30 +39,30 @@ const PortfolioHero = ({ data, onLinkClick }) => {
       </div>
 
       {/* Right Image */}
-      <div className="flex-1 relative flex justify-center items-center w-full max-w-[550px]">
+      <div className="flex-1 relative flex justify-center items-center w-full max-w-[550px] overflow-visible py-8 sm:py-0">
         {/* Animated glowing background (Enhanced purple glow) */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] h-[380px] rounded-full animate-[pulse_4s_ease-in-out_infinite] z-0 pointer-events-none" style={{ backgroundColor: 'rgba(139, 92, 246, 0.45)', filter: 'blur(75px)' }}></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[260px] h-[260px] sm:w-[380px] sm:h-[380px] rounded-full animate-[pulse_4s_ease-in-out_infinite] z-0 pointer-events-none" style={{ backgroundColor: 'rgba(139, 92, 246, 0.45)', filter: 'blur(75px)' }}></div>
 
         {/* Geometric background lines & glowing orbiting dots */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 opacity-100">
           {/* Box 1 (Inner Rotating) with 2 Orbiting Dots */}
-          <div className="w-[360px] h-[400px] lg:w-[470px] lg:h-[530px] border border-violet-400/25 rounded-[3rem] absolute transition-colors animate-[spin_30s_linear_infinite]">
-            <div className="absolute top-[10%] left-[10%] w-2.5 h-2.5 rounded-full bg-violet-300 shadow-[0_0_15px_#a78bfa]"></div>
-            <div className="absolute bottom-[10%] right-[10%] w-2.5 h-2.5 rounded-full bg-violet-300 shadow-[0_0_15px_#a78bfa]"></div>
+          <div className="w-[260px] h-[290px] sm:w-[360px] sm:h-[400px] lg:w-[470px] lg:h-[530px] border border-violet-400/25 rounded-[2rem] sm:rounded-[3rem] absolute transition-colors animate-[spin_30s_linear_infinite]">
+            <div className="absolute top-[10%] left-[10%] w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-violet-300 shadow-[0_0_15px_#a78bfa]"></div>
+            <div className="absolute bottom-[10%] right-[10%] w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-violet-300 shadow-[0_0_15px_#a78bfa]"></div>
           </div>
           
           {/* Box 2 (Middle Rotating) with 2 Orbiting Dots */}
-          <div className="w-[380px] h-[420px] lg:w-[495px] lg:h-[555px] border border-violet-400/20 rounded-[3.5rem] absolute transition-colors animate-[spin_40s_linear_infinite_reverse]">
-            <div className="absolute bottom-[15%] right-[15%] w-2.5 h-2.5 rounded-full bg-violet-300 shadow-[0_0_15px_#a78bfa]"></div>
-            <div className="absolute top-[15%] left-[15%] w-2.5 h-2.5 rounded-full bg-violet-300 shadow-[0_0_15px_#a78bfa]"></div>
+          <div className="w-[280px] h-[315px] sm:w-[380px] sm:h-[420px] lg:w-[495px] lg:h-[555px] border border-violet-400/20 rounded-[2.5rem] sm:rounded-[3.5rem] absolute transition-colors animate-[spin_40s_linear_infinite_reverse]">
+            <div className="absolute bottom-[15%] right-[15%] w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-violet-300 shadow-[0_0_15px_#a78bfa]"></div>
+            <div className="absolute top-[15%] left-[15%] w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-violet-300 shadow-[0_0_15px_#a78bfa]"></div>
           </div>
 
           {/* Box 3 (Outer Static - Upright, NO dot - significantly bigger & concentric) */}
-          <div className="w-[350px] h-[390px] lg:w-[460px] lg:h-[520px] border border-violet-400/35 rounded-[3rem] absolute transition-colors rotate-0">
+          <div className="w-[250px] h-[280px] sm:w-[350px] sm:h-[390px] lg:w-[460px] lg:h-[520px] border border-violet-400/35 rounded-[2rem] sm:rounded-[3rem] absolute transition-colors rotate-0">
           </div>
         </div>
 
-        <div className="relative z-10 w-[300px] h-[340px] lg:w-[400px] lg:h-[460px] bg-gradient-to-br from-gray-200 to-gray-400 rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/10 dark:border-white/5">
+        <div className="relative z-10 w-[220px] h-[250px] sm:w-[300px] sm:h-[340px] lg:w-[400px] lg:h-[460px] bg-gradient-to-br from-gray-200 to-gray-400 rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/10 dark:border-white/5">
           {avatarUrl ? (
             <img 
               src={avatarUrl} 

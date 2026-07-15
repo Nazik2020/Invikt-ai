@@ -5,7 +5,9 @@ const LivePreview = () => {
   const { portfolioData } = usePortfolio();
   const { fullName, tagline, avatarUrl, bio, location } = portfolioData.personalInfo;
 
-  const nameParts = fullName ? fullName.split(' ') : [''];
+  // Split name for stylistic rendering if possible (remove any trailing comma first)
+  const cleanFullName = fullName ? fullName.trim().replace(/,$/, '') : '';
+  const nameParts = cleanFullName ? cleanFullName.split(' ') : [''];
   const firstName = nameParts[0];
   const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
 
@@ -94,11 +96,11 @@ const LivePreview = () => {
                 {portfolioData.personalInfo.primaryDomain || "PORTFOLIO"}
               </p>
               
-              <h1 className="text-[3.5rem] leading-[1.05] font-sans font-black tracking-tight text-white mb-0 transition-colors uppercase">
-                {firstName}<br/>{lastName}{lastName && ','}
+              <h1 className="text-[2.25rem] leading-[1.05] font-sans font-black tracking-tight text-white mb-0 transition-colors uppercase">
+                {firstName}<br/>{lastName}
               </h1>
               
-              <h1 className="text-[3rem] leading-[1.1] font-sans font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-violet-300 to-violet-500 mb-6 drop-shadow-[0_0_15px_rgba(167,139,250,0.4)] whitespace-nowrap uppercase">
+              <h1 className="text-[1.8rem] leading-[1.1] font-sans font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-violet-300 to-violet-500 mb-6 drop-shadow-[0_0_15px_rgba(167,139,250,0.4)] uppercase">
                 {tagline || "DATA SCIENTIST"}
               </h1>
               

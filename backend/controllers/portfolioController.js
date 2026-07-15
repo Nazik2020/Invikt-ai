@@ -54,9 +54,9 @@ const getPublicPortfolio = async (req, res) => {
     const portfolio = await Portfolio.findOne({ 
       customUrl: req.params.customUrl,
       isPublished: true 
-    }).populate('user', 'name email');
+    }).populate('user', 'name email isDeactivated');
 
-    if (!portfolio) {
+    if (!portfolio || !portfolio.user || portfolio.user.isDeactivated) {
       return res.status(404).json({ message: 'Portfolio not found or not public' });
     }
 

@@ -284,11 +284,15 @@ const SideNavBar = () => {
             </button>
             <div
               title={`${username} — ${email}`}
-              className="w-9 h-9 mt-1 rounded-full bg-gradient-to-br from-primary-container to-secondary-fixed-dim flex items-center justify-center cursor-pointer ring-2 ring-primary/20"
+              className="w-9 h-9 mt-1 rounded-full bg-gradient-to-br from-primary-container to-secondary-fixed-dim flex items-center justify-center cursor-pointer ring-2 ring-primary/20 overflow-hidden shrink-0"
             >
-              <span className="text-sm font-black text-slate-900 dark:text-white">
-                {initial}
-              </span>
+              {user?.profilePicture ? (
+                <img src={user.profilePicture} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-sm font-black text-slate-900 dark:text-white">
+                  {initial}
+                </span>
+              )}
             </div>
           </div>
         ) : (
@@ -321,10 +325,14 @@ const SideNavBar = () => {
             </div>
             <div className="px-3 pb-4 pt-1">
               <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:bg-white/5 cursor-pointer transition-all group">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-container to-secondary-fixed-dim flex items-center justify-center shrink-0 ring-2 ring-primary/20">
-                  <span className="text-xs font-black text-slate-900 dark:text-white">
-                    {initial}
-                  </span>
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-container to-secondary-fixed-dim flex items-center justify-center shrink-0 ring-2 ring-primary/20 overflow-hidden">
+                  {user?.profilePicture ? (
+                    <img src={user.profilePicture} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-xs font-black text-slate-900 dark:text-white">
+                      {initial}
+                    </span>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[0.85rem] font-semibold text-slate-700 dark:text-white/80 truncate leading-tight">

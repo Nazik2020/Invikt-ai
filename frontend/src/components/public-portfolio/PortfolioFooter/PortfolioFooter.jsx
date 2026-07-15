@@ -55,7 +55,7 @@ const PortfolioFooter = ({ data, social, onLinkClick }) => {
 
       <div className="text-center border-t border-gray-200 dark:border-white/5 pt-8 transition-colors flex flex-col items-center justify-center gap-2">
         <p className="text-[0.75rem] text-gray-500 font-medium tracking-wider">
-          &copy; {new Date().getFullYear()} {data?.fullName || "User"}. All rights reserved.
+          &copy; {new Date().getFullYear()} {data?.fullName ? data.fullName.trim().replace(/,$/, '') : "User"}. All rights reserved.
         </p>
         <p className="text-[0.7rem] text-gray-400 dark:text-gray-500 font-medium tracking-wide flex items-center justify-center gap-1">
           Built with <span className="text-violet-500 font-bold tracking-wider">Invikt</span>

@@ -1,8 +1,348 @@
-import React from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useAuth } from "../../context/AuthContext";
+import { API_URL } from "../../config/api";
+import Select from "react-select";
+import countryList from "react-select-country-list";
 
 const ProfileSettings = () => {
+  const { getAuthHeaders, user, updateUser, logout } = useAuth();
+  
+  const [formData, setFormData] = useState({
+    fullName: "",
+    username: "",
+    email: "",
+    phoneNumber: "",
+    careerGoal: "",
+    university: "",
+    country: "United States",
+    bio: "",
+    profilePicture: "",
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+  const [lastSaved, setLastSaved] = useState("Never");
+  const [updatedAt, setUpdatedAt] = useState(null);
+
+  // Premium Modal State
+  const [modalConfig, setModalConfig] = useState({ show: false, type: "", title: "", desc: "", actionText: "" });
+
+  const fileInputRef = useRef(null);
+
+  // Helper to format last saved time dynamically
+  const formatLastSaved = (dateString) => {
+    if (!dateString) return "Never";
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "Never";
+    
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    
+    return date.toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+  };
+
+  // Dynamic tick for lastSaved relative text
+  useEffect(() => {
+    if (!updatedAt) return;
+    const interval = setInterval(() => {
+      setLastSaved(formatLastSaved(updatedAt));
+    }, 15000); // Update every 15 seconds for responsive UI feedback
+    return () => clearInterval(interval);
+  }, [updatedAt]);
+
+  // Country Options & Styles
+  const options = useMemo(() => countryList().getData(), []);
+  const customStyles = {
+    control: (provided, state) => ({
+      ...provided,
+      backgroundColor: 'transparent',
+      borderColor: state.isFocused ? 'rgba(171, 143, 244, 0.5)' : 'rgba(255, 255, 255, 0.05)',
+      borderRadius: '0.5rem',
+      minHeight: '44px',
+      boxShadow: 'none',
+      '&:hover': {
+        borderColor: 'rgba(171, 143, 244, 0.5)'
+      }
+    }),
+    menu: (provided) => ({
+      ...provided,
+      backgroundColor: '#17181c',
+      border: '1px solid rgba(255, 255, 255, 0.05)',
+      borderRadius: '0.5rem',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+      zIndex: 50
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isSelected ? 'rgba(171, 143, 244, 0.1)' : state.isFocused ? 'rgba(255, 255, 255, 0.02)' : 'transparent',
+      color: state.isSelected ? '#ab8ff4' : '#fff',
+      cursor: 'pointer',
+      fontSize: '0.875rem',
+      '&:active': {
+        backgroundColor: 'rgba(171, 143, 244, 0.1)'
+      }
+    }),
+    singleValue: (provided) => ({
+      ...provided,
+      color: '#fff',
+      fontSize: '0.875rem'
+    }),
+    input: (provided) => ({
+      ...provided,
+      color: '#fff',
+    }),
+    placeholder: (provided) => ({
+      ...provided,
+      color: 'rgba(255, 255, 255, 0.2)',
+      fontSize: '0.875rem'
+    })
+  };
+
+  const handleCountryChange = (selectedOption) => {
+    setFormData(prev => ({ ...prev, country: selectedOption.label }));
+  };
+
+  // Fetch initial data
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch(`${API_URL}/settings/profile`, {
+          headers: getAuthHeaders()
+        });
+        const json = await res.json();
+        
+        if (json.success) {
+          setFormData({
+            fullName: json.data.fullName || "",
+            username: json.data.username || "",
+            email: json.data.email || "",
+            phoneNumber: json.data.phoneNumber || "",
+            careerGoal: json.data.careerGoal || "",
+            university: json.data.university || "",
+            country: json.data.country || "United States",
+            bio: json.data.bio || "",
+            profilePicture: json.data.profilePicture || "",
+          });
+          if (json.data.updatedAt) {
+            setUpdatedAt(json.data.updatedAt);
+            setLastSaved(formatLastSaved(json.data.updatedAt));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch profile:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const showToast = (message, type = "success") => {
+    setToast({ show: true, message, type });
+    setTimeout(() => setToast({ show: false, message: "", type: "success" }), 4000);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "bio" && value.length > 200) return;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`${API_URL}/settings/profile`, {
+        method: "PUT",
+        headers: {
+          ...getAuthHeaders(),
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+      });
+      const json = await res.json();
+      
+      if (json.success) {
+        showToast("Profile updated successfully", "success");
+        setFormData(prev => ({ ...prev, ...json.data }));
+        if (json.data.updatedAt) {
+          setUpdatedAt(json.data.updatedAt);
+          setLastSaved(formatLastSaved(json.data.updatedAt));
+        } else {
+          const nowIso = new Date().toISOString();
+          setUpdatedAt(nowIso);
+          setLastSaved(formatLastSaved(nowIso));
+        }
+
+        // Sync with global state
+        const nameParts = (json.data.fullName || "").trim().split(" ");
+        const firstName = nameParts[0] || "";
+        const lastName = nameParts.slice(1).join(" ") || "";
+        updateUser({
+          firstName,
+          lastName,
+          fullName: json.data.fullName,
+          username: json.data.username,
+          profilePicture: json.data.profilePicture
+        });
+      } else {
+        showToast(json.message || "Failed to update profile", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("Server error occurred", "error");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Image Upload Handler
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      showToast("Image size must be less than 2MB", "error");
+      return;
+    }
+
+    const imgData = new FormData();
+    imgData.append("file", file);
+    imgData.append("context", "profile");
+
+    try {
+      showToast("Uploading image...", "info");
+      const headers = getAuthHeaders();
+      delete headers["Content-Type"]; // Let browser set multipart boundary
+
+      const res = await fetch(`${API_URL}/upload`, {
+        method: "POST",
+        headers: headers,
+        body: imgData,
+      });
+      const json = await res.json();
+      
+      if (json.success) {
+        setFormData(prev => ({ ...prev, profilePicture: json.url }));
+        showToast("Profile picture updated!", "success");
+        updateUser({ profilePicture: json.url });
+        
+        // Also save the form automatically
+        await fetch(`${API_URL}/settings/profile`, {
+          method: "PUT",
+          headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+          body: JSON.stringify({ profilePicture: json.url })
+        });
+      } else {
+        showToast(json.message || "Failed to upload image", "error");
+      }
+    } catch (err) {
+      showToast("Upload failed", "error");
+    }
+  };
+
+  const removePhoto = async () => {
+    setFormData(prev => ({ ...prev, profilePicture: "" }));
+    updateUser({ profilePicture: "" });
+    try {
+      await fetch(`${API_URL}/settings/profile`, {
+        method: "PUT",
+        headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ profilePicture: "" })
+      });
+      showToast("Profile picture removed", "success");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Danger Zone Actions
+  const handleDangerAction = async () => {
+    const isDeactivate = modalConfig.type === "deactivate";
+    const endpoint = isDeactivate ? "/settings/profile/deactivate" : "/settings/profile";
+    const method = isDeactivate ? "PUT" : "DELETE";
+
+    try {
+      const res = await fetch(`${API_URL}${endpoint}`, {
+        method,
+        headers: getAuthHeaders()
+      });
+      const json = await res.json();
+      
+      if (json.success) {
+        setModalConfig({ show: false, type: "", title: "", desc: "", actionText: "" });
+        // Log out the user cleanly
+        logout();
+        window.location.href = "/signin";
+      } else {
+        showToast(json.message || "Action failed", "error");
+      }
+    } catch (err) {
+      showToast("Server error occurred", "error");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-500"></div>
+      </div>
+    );
+  }
+
+  const initialLetter = (formData.fullName || user?.firstName || "N")[0].toUpperCase();
+
   return (
-    <div>
+    <div className="relative">
+      
+      {/* Toast Notification (Premium Glassmorphic) */}
+      {toast.show && (
+        <div className="fixed top-8 right-8 z-[9999] animate-fade-in-up">
+          <div className={`flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] border ${toast.type === 'error' ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : toast.type === 'info' ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : 'bg-violet-500/10 border-violet-500/20 text-violet-400'} backdrop-blur-xl`}>
+            <span className="material-symbols-outlined text-[20px]">
+              {toast.type === 'error' ? 'error' : toast.type === 'info' ? 'info' : 'check_circle'}
+            </span>
+            <span className="text-sm font-bold tracking-wide">{toast.message}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Danger Zone Modal (Premium) */}
+      {modalConfig.show && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-[#0f1115]/80 backdrop-blur-md transition-opacity animate-fade-in" onClick={() => setModalConfig({ ...modalConfig, show: false })}></div>
+          <div className="relative bg-[#16181d] border border-white/10 rounded-[1.5rem] p-8 max-w-md w-full shadow-2xl animate-fade-in-up">
+            <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-5">
+              <span className="material-symbols-outlined text-red-500 text-[24px]">warning</span>
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2">{modalConfig.title}</h2>
+            <p className="text-sm text-slate-400 mb-8">{modalConfig.desc}</p>
+            <div className="flex gap-3 justify-end">
+              <button 
+                onClick={() => setModalConfig({ ...modalConfig, show: false })}
+                className="px-6 py-2.5 rounded-xl border border-white/10 hover:bg-white/5 text-white text-sm font-bold transition-all"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleDangerAction}
+                className="px-6 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-bold shadow-[0_0_20px_rgba(239,68,68,0.3)] transition-all"
+              >
+                {modalConfig.actionText}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mb-10">
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
           Profile
@@ -14,19 +354,33 @@ const ProfileSettings = () => {
 
       {/* Avatar Section */}
       <div className="bg-white dark:bg-[#17181c] border border-slate-200 dark:border-white/5 rounded-2xl p-6 mb-12 flex flex-col sm:flex-row items-center sm:items-start gap-6">
-        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#ab8ff4] to-[#5d21df] flex items-center justify-center shrink-0 shadow-[0_0_30px_rgba(171,143,244,0.3)]">
-          <span className="text-4xl font-black text-slate-900 dark:text-white">
-            N
-          </span>
+        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#ab8ff4] to-[#5d21df] flex items-center justify-center shrink-0 shadow-[0_0_30px_rgba(171,143,244,0.3)] relative overflow-hidden">
+          {formData.profilePicture ? (
+            <img src={formData.profilePicture} alt="Avatar" className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-4xl font-black text-slate-900 dark:text-white">{initialLetter}</span>
+          )}
         </div>
         <div className="flex flex-col items-center sm:items-start justify-center flex-1 h-full pt-2">
           <div className="flex items-center gap-3 mb-3">
-            <button className="px-5 py-2 rounded-full border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:bg-white/5 transition-all text-xs font-bold text-slate-900 dark:text-white tracking-widest uppercase">
+            <input 
+              type="file" 
+              accept="image/png, image/jpeg" 
+              className="hidden" 
+              ref={fileInputRef} 
+              onChange={handleImageChange}
+            />
+            <button 
+              onClick={() => fileInputRef.current.click()}
+              className="px-5 py-2 rounded-full border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:bg-white/5 transition-all text-xs font-bold text-slate-900 dark:text-white tracking-widest uppercase cursor-pointer"
+            >
               Change Photo
             </button>
-            <button className="px-4 py-2 text-xs font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-widest">
-              Remove
-            </button>
+            {formData.profilePicture && (
+              <button onClick={removePhoto} className="px-4 py-2 text-xs font-bold text-red-400 hover:text-red-300 transition-colors uppercase tracking-widest">
+                Remove
+              </button>
+            )}
           </div>
           <p className="text-[11px] text-slate-500 dark:text-white/40">
             JPG or PNG. Max 2MB. Recommended 400x400px.
@@ -46,7 +400,9 @@ const ProfileSettings = () => {
             </label>
             <input
               type="text"
-              defaultValue="Nazik P."
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
               className="w-full bg-white dark:bg-[#17181c] border border-slate-200 dark:border-white/5 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#ab8ff4]/50 transition-colors"
             />
           </div>
@@ -57,11 +413,13 @@ const ProfileSettings = () => {
             <div className="relative flex items-center w-full bg-white dark:bg-[#17181c] border border-slate-200 dark:border-white/5 rounded-lg overflow-hidden focus-within:border-[#ab8ff4]/50 transition-colors">
               <input
                 type="text"
-                defaultValue="nazik"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
                 className="flex-1 bg-transparent px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none min-w-0"
               />
               <div className="hidden sm:flex px-4 text-[11px] text-slate-400 dark:text-white/30 border-l border-slate-200 dark:border-white/5 h-full items-center bg-white/[0.02] pointer-events-none shrink-0">
-                invikt.com/u/nazik
+                invikt.com/p/{formData.username || "username"}
               </div>
             </div>
           </div>
@@ -75,8 +433,9 @@ const ProfileSettings = () => {
             <div className="relative w-full">
               <input
                 type="email"
-                defaultValue="nazik.pro@invikt.ai"
-                className="w-full bg-white dark:bg-[#17181c] border border-slate-200 dark:border-white/5 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#ab8ff4]/50 transition-colors"
+                value={formData.email}
+                disabled
+                className="w-full bg-white dark:bg-[#17181c] border border-slate-200 dark:border-white/5 rounded-lg px-4 py-3 text-sm text-slate-400 dark:text-white/40 cursor-not-allowed focus:outline-none transition-colors"
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2 bg-slate-50 dark:bg-[#00daf3]/10 text-slate-900 dark:text-[#00daf3] rounded-full px-2.5 py-1 flex items-center gap-1">
                 <span className="material-symbols-outlined text-[12px]">
@@ -97,6 +456,9 @@ const ProfileSettings = () => {
             </label>
             <input
               type="tel"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleChange}
               placeholder="+1 (555) 000-0000"
               className="w-full bg-white dark:bg-[#17181c] border border-slate-200 dark:border-white/5 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#ab8ff4]/50 transition-colors placeholder:text-slate-400 dark:text-white/20"
             />
@@ -116,7 +478,10 @@ const ProfileSettings = () => {
           </label>
           <input
             type="text"
-            defaultValue="Senior AI Systems Architect"
+            name="careerGoal"
+            value={formData.careerGoal}
+            onChange={handleChange}
+            placeholder="e.g. Senior AI Systems Architect"
             className="w-full bg-white dark:bg-[#17181c] border border-slate-200 dark:border-white/5 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#ab8ff4]/50 transition-colors"
           />
         </div>
@@ -128,7 +493,10 @@ const ProfileSettings = () => {
             </label>
             <input
               type="text"
-              defaultValue="Nexus Tech Institute"
+              name="university"
+              value={formData.university}
+              onChange={handleChange}
+              placeholder="e.g. Nexus Tech Institute"
               className="w-full bg-white dark:bg-[#17181c] border border-slate-200 dark:border-white/5 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#ab8ff4]/50 transition-colors"
             />
           </div>
@@ -136,17 +504,15 @@ const ProfileSettings = () => {
             <label className="block text-xs font-bold text-slate-700 dark:text-white/80 mb-2">
               Country/Region
             </label>
-            <div className="relative">
-              <select className="w-full bg-white dark:bg-[#17181c] border border-slate-200 dark:border-white/5 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#ab8ff4]/50 transition-colors appearance-none cursor-pointer">
-                <option>United States</option>
-                <option>Canada</option>
-                <option>United Kingdom</option>
-                <option>Australia</option>
-                <option>India</option>
-              </select>
-              <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-white/40 pointer-events-none">
-                expand_more
-              </span>
+            <div className="relative w-full bg-white dark:bg-[#17181c] border border-slate-200 dark:border-transparent rounded-lg">
+              <Select 
+                options={options}
+                value={options.find(opt => opt.label === formData.country) || null}
+                onChange={handleCountryChange}
+                styles={customStyles}
+                placeholder="Select Country"
+                classNamePrefix="react-select"
+              />
             </div>
           </div>
         </div>
@@ -157,10 +523,13 @@ const ProfileSettings = () => {
               Professional Bio
             </label>
             <span className="text-[10px] text-slate-500 dark:text-white/40 font-medium tracking-widest">
-              0 / 200
+              {formData.bio.length} / 200
             </span>
           </div>
           <textarea
+            name="bio"
+            value={formData.bio}
+            onChange={handleChange}
             rows="4"
             placeholder="Describe your professional journey and aspirations..."
             className="w-full bg-white dark:bg-[#17181c] border border-slate-200 dark:border-white/5 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#ab8ff4]/50 transition-colors resize-none placeholder:text-slate-400 dark:text-white/20"
@@ -170,11 +539,18 @@ const ProfileSettings = () => {
 
       {/* Save Button */}
       <div className="mb-12">
-        <button className="w-full bg-gradient-to-r from-[#ab8ff4] to-[#814df3] hover:from-[#bda5f7] hover:to-[#9165f5] text-slate-900 dark:text-white font-bold py-3.5 rounded-xl shadow-[0_10px_20px_rgba(129,77,243,0.2)] transition-all uppercase tracking-widest text-xs">
-          Save Changes
+        <button 
+          onClick={handleSave}
+          disabled={saving}
+          className="w-full bg-gradient-to-r from-[#ab8ff4] to-[#814df3] hover:from-[#bda5f7] hover:to-[#9165f5] text-slate-900 dark:text-white font-bold py-3.5 rounded-xl shadow-[0_10px_20px_rgba(129,77,243,0.2)] transition-all uppercase tracking-widest text-xs flex items-center justify-center gap-2"
+        >
+          {saving ? (
+            <span className="material-symbols-outlined animate-spin text-[16px]">sync</span>
+          ) : null}
+          {saving ? "Saving..." : "Save Changes"}
         </button>
         <div className="text-[9px] text-slate-400 dark:text-white/30 uppercase tracking-[0.2em] text-center mt-3 font-bold">
-          Last Saved 2 Hours Ago
+          Last Saved: {lastSaved}
         </div>
       </div>
 
@@ -201,7 +577,16 @@ const ProfileSettings = () => {
               time.
             </div>
           </div>
-          <button className="px-6 py-2 rounded-lg border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:border-white/20 text-slate-700 dark:text-white/80 hover:text-slate-900 dark:text-white text-xs font-bold uppercase tracking-widest transition-colors shrink-0">
+          <button 
+            onClick={() => setModalConfig({ 
+              show: true, 
+              type: "deactivate", 
+              title: "Deactivate Account", 
+              desc: "Are you sure you want to deactivate your account? Your profile will be hidden until you sign in again.",
+              actionText: "Yes, Deactivate"
+            })}
+            className="px-6 py-2 rounded-lg border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:border-white/20 text-slate-700 dark:text-white/80 hover:text-slate-900 dark:text-white text-xs font-bold uppercase tracking-widest transition-colors shrink-0"
+          >
             Deactivate
           </button>
         </div>
@@ -216,7 +601,16 @@ const ProfileSettings = () => {
               from Invikt.
             </div>
           </div>
-          <button className="px-6 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold uppercase tracking-widest transition-colors shrink-0">
+          <button 
+            onClick={() => setModalConfig({ 
+              show: true, 
+              type: "delete", 
+              title: "Delete Account", 
+              desc: "Are you sure you want to permanently delete your account? This action cannot be undone.",
+              actionText: "Delete Permanently"
+            })}
+            className="px-6 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold uppercase tracking-widest transition-colors shrink-0"
+          >
             Delete Account
           </button>
         </div>

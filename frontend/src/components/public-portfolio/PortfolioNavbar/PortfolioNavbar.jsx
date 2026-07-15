@@ -19,8 +19,9 @@ const PortfolioNavbar = ({ data }) => {
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
-  // Use the full name or fallback to "user"
-  const firstName = data?.fullName ? data.fullName.split(' ')[0].toLowerCase() : 'user';
+  // Use the full name (cleaned of trailing commas) or fallback to "user"
+  const cleanFullName = data?.fullName ? data.fullName.trim().replace(/,$/, '') : '';
+  const firstName = cleanFullName ? cleanFullName.split(' ')[0].toLowerCase() : 'user';
 
   return (
     <header className="fixed top-0 left-0 w-full bg-white/90 dark:bg-[#0d0e12]/90 backdrop-blur-md border-b border-gray-200 dark:border-white/5 z-[100] transition-colors">

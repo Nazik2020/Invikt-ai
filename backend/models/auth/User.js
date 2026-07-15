@@ -47,6 +47,31 @@ const userSchema = new mongoose.Schema(
       enum: ["student", "admin"],
       default: "student",
     },
+    phoneNumber: {
+      type: String,
+      default: "",
+    },
+    careerGoal: {
+      type: String,
+      default: "",
+    },
+    university: {
+      type: String,
+      default: "",
+    },
+    country: {
+      type: String,
+      default: "",
+    },
+    bio: {
+      type: String,
+      default: "",
+      maxlength: [200, "Bio cannot be more than 200 characters"],
+    },
+    isDeactivated: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

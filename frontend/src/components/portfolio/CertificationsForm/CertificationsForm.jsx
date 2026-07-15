@@ -10,11 +10,11 @@ const CertificationsForm = () => {
   };
 
   const removeItem = (id) => {
-    updateSection("certifications", items.filter(item => item.id !== id));
+    updateSection("certifications", items.filter(item => (item._id || item.id) !== id));
   };
 
   const handleChange = (id, field, value) => {
-    updateSection("certifications", items.map(item => item.id === id ? { ...item, [field]: value } : item));
+    updateSection("certifications", items.map(item => (item._id || item.id) === id ? { ...item, [field]: value } : item));
   };
 
   return (
@@ -33,75 +33,78 @@ const CertificationsForm = () => {
       </div>
 
       <div className="flex flex-col gap-6">
-        {items.map((item, index) => (
-          <div key={item.id} className="relative p-6 rounded-lg border border-white/10 bg-[#1e1f23] flex flex-col gap-4">
-            {items.length > 1 && (
-              <button 
-                onClick={() => removeItem(item.id)}
-                className="absolute top-4 right-4 text-white/20 hover:text-red-400 transition-colors"
-              >
-                <span className="material-symbols-outlined text-[20px]">delete</span>
-              </button>
-            )}
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Certificate Title</label>
-                <input 
-                  type="text" 
-                  value={item.title}
-                  onChange={(e) => handleChange(item.id, 'title', e.target.value)}
-                  placeholder="e.g. AWS Solutions Architect" 
-                  className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-2.5 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
-                />
+        {items.map((item, index) => {
+          const itemId = item._id || item.id;
+          return (
+            <div key={itemId || index} className="relative p-6 rounded-lg border border-white/10 bg-[#1e1f23] flex flex-col gap-4">
+              {items.length > 1 && (
+                <button 
+                  onClick={() => removeItem(itemId)}
+                  className="absolute top-4 right-4 text-white/20 hover:text-red-400 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[20px]">delete</span>
+                </button>
+              )}
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Certificate Title</label>
+                  <input 
+                    type="text" 
+                    value={item.title}
+                    onChange={(e) => handleChange(itemId, 'title', e.target.value)}
+                    placeholder="e.g. AWS Solutions Architect" 
+                    className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-2.5 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Provider / Issuer</label>
+                  <input 
+                    type="text" 
+                    value={item.provider}
+                    onChange={(e) => handleChange(itemId, 'provider', e.target.value)}
+                    placeholder="e.g. Amazon Web Services" 
+                    className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-2.5 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Date Earned</label>
+                  <input 
+                    type="text" 
+                    value={item.date}
+                    onChange={(e) => handleChange(itemId, 'date', e.target.value)}
+                    placeholder="e.g. March 2024" 
+                    className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-2.5 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
+                  />
+                </div>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Provider / Issuer</label>
-                <input 
-                  type="text" 
-                  value={item.provider}
-                  onChange={(e) => handleChange(item.id, 'provider', e.target.value)}
-                  placeholder="e.g. Amazon Web Services" 
-                  className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-2.5 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Date Earned</label>
-                <input 
-                  type="text" 
-                  value={item.date}
-                  onChange={(e) => handleChange(item.id, 'date', e.target.value)}
-                  placeholder="e.g. March 2024" 
-                  className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-2.5 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
-                />
-              </div>
-            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Skills Gained (Comma Separated)</label>
-                <input 
-                  type="text" 
-                  value={item.skills}
-                  onChange={(e) => handleChange(item.id, 'skills', e.target.value)}
-                  placeholder="e.g. Cloud Computing, IAM, Networking" 
-                  className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-2.5 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Skills Gained (Comma Separated)</label>
+                  <input 
+                    type="text" 
+                    value={item.skills}
+                    onChange={(e) => handleChange(itemId, 'skills', e.target.value)}
+                    placeholder="e.g. Cloud Computing, IAM, Networking" 
+                    className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-2.5 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Certificate URL</label>
+                  <input 
+                    type="url" 
+                    value={item.certificateUrl}
+                    onChange={(e) => handleChange(itemId, 'certificateUrl', e.target.value)}
+                    placeholder="https://..." 
+                    className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-2.5 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
+                  />
+                </div>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Certificate URL</label>
-                <input 
-                  type="url" 
-                  value={item.certificateUrl}
-                  onChange={(e) => handleChange(item.id, 'certificateUrl', e.target.value)}
-                  placeholder="https://..." 
-                  className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-2.5 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
-                />
-              </div>
+              
             </div>
-            
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

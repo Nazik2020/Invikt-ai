@@ -10,11 +10,11 @@ const VolunteeringForm = () => {
   };
 
   const removeItem = (id) => {
-    updateSection("volunteering", items.filter(item => item.id !== id));
+    updateSection("volunteering", items.filter(item => (item._id || item.id) !== id));
   };
 
   const handleChange = (id, field, value) => {
-    updateSection("volunteering", items.map(item => item.id === id ? { ...item, [field]: value } : item));
+    updateSection("volunteering", items.map(item => (item._id || item.id) === id ? { ...item, [field]: value } : item));
   };
 
   return (
@@ -33,82 +33,85 @@ const VolunteeringForm = () => {
       </div>
 
       <div className="flex flex-col gap-6">
-        {items.map((item, index) => (
-          <div key={item.id} className="relative p-6 rounded-lg border border-white/10 bg-[#1e1f23] flex flex-col gap-4">
-            {items.length > 1 && (
-              <button 
-                onClick={() => removeItem(item.id)}
-                className="absolute top-4 right-4 text-white/20 hover:text-red-400 transition-colors"
-              >
-                <span className="material-symbols-outlined text-[20px]">delete</span>
-              </button>
-            )}
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Role</label>
-                <input 
-                  type="text" 
-                  value={item.role}
-                  onChange={(e) => handleChange(item.id, 'role', e.target.value)}
-                  placeholder="e.g. Microsoft Student Ambassador" 
-                  className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-2.5 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Organization & Period</label>
-                <input 
-                  type="text" 
-                  value={item.organization}
-                  onChange={(e) => handleChange(item.id, 'organization', e.target.value)}
-                  placeholder="e.g. MICROSOFT • APR 2026 - PRESENT" 
-                  className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-2.5 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Icon</label>
-                <div className="relative">
-                  <select 
-                    value={item.iconName || 'star'}
-                    onChange={(e) => handleChange(item.id, 'iconName', e.target.value)}
-                    className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-2.5 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors appearance-none cursor-pointer"
-                  >
-                    <option value="star">Star</option>
-                    <option value="volunteer_activism">Heart / Volunteer</option>
-                    <option value="group">People / Team</option>
-                    <option value="code">Code / Development</option>
-                    <option value="school">Education / Mentoring</option>
-                    <option value="public">Global / Community</option>
-                    <option value="handshake">Partnership</option>
-                    <option value="campaign">Advocacy</option>
-                  </select>
-                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none text-[18px]">expand_more</span>
+        {items.map((item, index) => {
+          const itemId = item._id || item.id;
+          return (
+            <div key={itemId || index} className="relative p-6 rounded-lg border border-white/10 bg-[#1e1f23] flex flex-col gap-4">
+              {items.length > 1 && (
+                <button 
+                  onClick={() => removeItem(itemId)}
+                  className="absolute top-4 right-4 text-white/20 hover:text-red-400 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[20px]">delete</span>
+                </button>
+              )}
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Role</label>
+                  <input 
+                    type="text" 
+                    value={item.role}
+                    onChange={(e) => handleChange(itemId, 'role', e.target.value)}
+                    placeholder="e.g. Microsoft Student Ambassador" 
+                    className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-2.5 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Organization & Period</label>
+                  <input 
+                    type="text" 
+                    value={item.organization}
+                    onChange={(e) => handleChange(itemId, 'organization', e.target.value)}
+                    placeholder="e.g. MICROSOFT • APR 2026 - PRESENT" 
+                    className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-2.5 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Icon</label>
+                  <div className="relative">
+                    <select 
+                      value={item.iconName || 'star'}
+                      onChange={(e) => handleChange(itemId, 'iconName', e.target.value)}
+                      className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-2.5 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors appearance-none cursor-pointer"
+                    >
+                      <option value="star">Star</option>
+                      <option value="volunteer_activism">Heart / Volunteer</option>
+                      <option value="group">People / Team</option>
+                      <option value="code">Code / Development</option>
+                      <option value="school">Education / Mentoring</option>
+                      <option value="public">Global / Community</option>
+                      <option value="handshake">Partnership</option>
+                      <option value="campaign">Advocacy</option>
+                    </select>
+                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none text-[18px]">expand_more</span>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Org Link</label>
+                  <input 
+                    type="url" 
+                    value={item.orgLink}
+                    onChange={(e) => handleChange(itemId, 'orgLink', e.target.value)}
+                    placeholder="https://..." 
+                    className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-2.5 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
+                  />
                 </div>
               </div>
+
               <div className="space-y-1.5">
-                <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Org Link</label>
-                <input 
-                  type="url" 
-                  value={item.orgLink}
-                  onChange={(e) => handleChange(item.id, 'orgLink', e.target.value)}
-                  placeholder="https://..." 
-                  className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-2.5 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors"
+                <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Description</label>
+                <textarea 
+                  value={item.description}
+                  onChange={(e) => handleChange(itemId, 'description', e.target.value)}
+                  placeholder="Describe your volunteering role..." 
+                  rows={3}
+                  className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-3 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors resize-none"
                 />
               </div>
             </div>
-
-            <div className="space-y-1.5">
-              <label className="text-[0.65rem] font-black text-white/40 uppercase tracking-widest">Description</label>
-              <textarea 
-                value={item.description}
-                onChange={(e) => handleChange(item.id, 'description', e.target.value)}
-                placeholder="Describe your volunteering role..." 
-                rows={3}
-                className="w-full bg-[#17181c] border border-white/10 rounded-md px-4 py-3 text-[0.85rem] text-white focus:outline-none focus:border-violet-500/50 transition-colors resize-none"
-              />
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

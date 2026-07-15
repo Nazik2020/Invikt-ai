@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, { createContext, useState, useEffect, useContext, useCallback } from "react";
 
 import { API_URL } from "../config/api";
 
@@ -120,10 +120,17 @@ export const AuthProvider = ({ children }) => {
   };
 
   // ─── Auth headers helper for API calls ────────────────────────────────────
-  const getAuthHeaders = () => ({
+  const getAuthHeaders = useCallback(() => ({
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
-  });
+  }), [token]);
+
+  const updateUser = (updatedFields) => {
+    setUser(prev => {
+      if (!prev) return null;
+      return { ...prev, ...updatedFields };
+    });
+  };
 
   const isAuthenticated = !!user && !!token;
 
@@ -139,6 +146,7 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         getAuthHeaders,
+        updateUser,
       }}
     >
       {children}

@@ -107,6 +107,12 @@ exports.login = async (req, res) => {
       return res.status(401).json({ success: false, error: "Invalid email or password." });
     }
 
+    // Reactivate account if it was deactivated
+    if (user.isDeactivated) {
+      user.isDeactivated = false;
+      await user.save();
+    }
+
     // rememberMe = 30 days, normal session = 7 days
     const token = generateToken(user._id, !!rememberMe);
 
