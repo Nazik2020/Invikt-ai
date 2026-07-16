@@ -47,6 +47,7 @@ const portfolioShareRoutes = require("./routes/share/portfolioShareRoutes");
 const dashboardRoutes = require("./routes/dashboard/dashboardRoutes");
 const roadmapRoutes = require("./routes/roadmaps/roadmapRoutes");
 const profileRoutes = require("./routes/settings/profileRoutes");
+const adminRoutes = require("./routes/admin/adminRoutes");
 
 // ─── Mount Routes ─────────────────────────────────────────────────────────────
 app.use("/api/auth", authLimiter, authRoutes); // Auth routes (with strict limiter)
@@ -57,6 +58,7 @@ app.use("/api/portfolio/share", portfolioShareRoutes); // Portfolio Sharing & An
 app.use("/api/dashboard", dashboardRoutes);    // Dashboard metrics
 app.use("/api/roadmaps", roadmapRoutes);       // Roadmap progress
 app.use("/api/settings/profile", profileRoutes); // Settings Profile routes
+app.use("/api/admin", adminRoutes);              // Admin Dashboard routes
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get("/", (req, res) => {

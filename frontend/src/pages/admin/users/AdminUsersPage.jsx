@@ -1,10 +1,55 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import UsersTable from "./components/UsersTable";
 import UserProfileSidebar from "./components/UserProfileSidebar";
+import { useAuth } from "../../../context/AuthContext";
+import { API_URL } from "../../../config/api";
 
 const AdminUsersPage = () => {
+  const { getAuthHeaders } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  
+  // State for data
+  const [users, setUsers] = useState([]);
+  const [stats, setStats] = useState({ total: 0, pro: 0, free: 0, suspended: 0 });
+  const [pagination, setPagination] = useState({ total: 0, page: 1, pages: 1 });
+  const [loading, setLoading] = useState(true);
+  
+  // Filters
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [page, search, roleFilter, statusFilter]);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const queryParams = new URLSearchParams({
+        page,
+        limit: 12,
+        search,
+        role: roleFilter,
+        status: statusFilter
+      });
+      const response = await fetch(`${API_URL}/admin/users?${queryParams}`, {
+        headers: getAuthHeaders(),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setUsers(data.data);
+        setStats(data.stats);
+        setPagination(data.pagination);
+      }
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleRowClick = (user) => {
     setSelectedUser(user);
@@ -27,7 +72,7 @@ const AdminUsersPage = () => {
                 User Management
               </h1>
               <p className="text-[13px] text-slate-500 dark:text-slate-400">
-                Manage and monitor all 1,284 registered Invikt users across platforms.
+                Manage and monitor all {stats.total} registered Invikt users across platforms.
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -54,7 +99,7 @@ const AdminUsersPage = () => {
                   TOTAL USERS
                 </div>
                 <div className="text-2xl font-headline font-black text-slate-800 dark:text-white">
-                  1,284
+                  {stats.total.toLocaleString()}
                 </div>
               </div>
             </div>
@@ -69,7 +114,7 @@ const AdminUsersPage = () => {
                   PRO USERS
                 </div>
                 <div className="text-2xl font-headline font-black text-slate-800 dark:text-white">
-                  47
+                  {stats.pro.toLocaleString()}
                 </div>
               </div>
             </div>
@@ -84,7 +129,7 @@ const AdminUsersPage = () => {
                   FREE USERS
                 </div>
                 <div className="text-2xl font-headline font-black text-slate-800 dark:text-white">
-                  1,237
+                  {stats.free.toLocaleString()}
                 </div>
               </div>
             </div>
@@ -99,7 +144,7 @@ const AdminUsersPage = () => {
                   SUSPENDED
                 </div>
                 <div className="text-2xl font-headline font-black text-slate-800 dark:text-white">
-                  12
+                  {stats.suspended.toLocaleString()}
                 </div>
               </div>
             </div>
@@ -107,7 +152,19 @@ const AdminUsersPage = () => {
 
           {/* Table Area */}
           <div className="bg-white dark:bg-[#15171b] border border-slate-200 dark:border-white/5 rounded-2xl shadow-sm flex flex-col">
-            <UsersTable onRowClick={handleRowClick} />
+            <UsersTable 
+              users={users} 
+              pagination={pagination}
+              onPageChange={setPage}
+              search={search}
+              setSearch={setSearch}
+              roleFilter={roleFilter}
+              setRoleFilter={setRoleFilter}
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
+              loading={loading}
+              onRowClick={handleRowClick} 
+            />
           </div>
         </div>
       </div>
@@ -117,6 +174,12 @@ const AdminUsersPage = () => {
         isOpen={isProfileOpen}
         onClose={closeProfile}
         user={selectedUser}
+        onUserUpdate={(updatedFields) => {
+          if (updatedFields) {
+            setSelectedUser(prev => ({ ...prev, ...updatedFields }));
+          }
+          fetchUsers();
+        }}
       />
     </div>
   );
