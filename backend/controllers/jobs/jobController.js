@@ -1,73 +1,92 @@
 const JobApplication = require("../../models/jobs/JobApplication");
 
-// @desc    Get all job applications for the logged-in user
-// @route   GET /api/jobs
-// @access  Private
-exports.getJobs = async (req, res) => {
+exports.getJobs = async (req, res, next) => {
   try {
     const jobs = await JobApplication.find({ userId: req.user.id }).sort({
       createdAt: -1,
     });
     res.status(200).json({ success: true, count: jobs.length, data: jobs });
   } catch (error) {
-    res.status(500).json({ success: false, error: "Server Error" });
+    next(error);
   }
 };
 
-// @desc    Add a new job application
-// @route   POST /api/jobs
-// @access  Private
-exports.addJob = async (req, res) => {
+exports.addJob = async (req, res, next) => {
   try {
-    const jobData = { ...req.body, userId: req.user.id };
-    const job = await JobApplication.create(jobData);
+    const { company, role, stage, badge, source, location, employment, jobUrl, dateApplied, notes, info, logoColor, logoText } = req.body;
+
+    const job = await JobApplication.create({
+      company,
+      role,
+      stage: stage || "WISHLIST",
+      badge,
+      source,
+      location,
+      employment,
+      jobUrl,
+      dateApplied,
+      notes,
+      info,
+      logoColor,
+      logoText,
+      userId: req.user.id,
+    });
+
     res.status(201).json({ success: true, data: job });
   } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
+    next(error);
   }
 };
 
-// @desc    Update a job application
-// @route   PUT /api/jobs/:id
-// @access  Private
-exports.updateJob = async (req, res) => {
+exports.updateJob = async (req, res, next) => {
   try {
+    const { company, role, stage, badge, source, location, employment, jobUrl, dateApplied, notes, info, logoColor, logoText, time } = req.body;
+
+    const updateData = {};
+    if (company !== undefined) updateData.company = company;
+    if (role !== undefined) updateData.role = role;
+    if (stage !== undefined) updateData.stage = stage;
+    if (badge !== undefined) updateData.badge = badge;
+    if (source !== undefined) updateData.source = source;
+    if (location !== undefined) updateData.location = location;
+    if (employment !== undefined) updateData.employment = employment;
+    if (jobUrl !== undefined) updateData.jobUrl = jobUrl;
+    if (dateApplied !== undefined) updateData.dateApplied = dateApplied;
+    if (notes !== undefined) updateData.notes = notes;
+    if (info !== undefined) updateData.info = info;
+    if (logoColor !== undefined) updateData.logoColor = logoColor;
+    if (logoText !== undefined) updateData.logoText = logoText;
+    if (time !== undefined) updateData.time = time;
+
     const job = await JobApplication.findOneAndUpdate(
-      { _id: req.params.id, userId: req.user.id }, // Ensures ownership
-      req.body,
+      { _id: req.params.id, userId: req.user.id },
+      { $set: updateData },
       { new: true, runValidators: true }
     );
 
     if (!job) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Job not found or not authorized." });
+      return res.status(404).json({ success: false, error: "Job not found or not authorized." });
     }
 
     res.status(200).json({ success: true, data: job });
   } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
+    next(error);
   }
 };
 
-// @desc    Delete a job application
-// @route   DELETE /api/jobs/:id
-// @access  Private
-exports.deleteJob = async (req, res) => {
+exports.deleteJob = async (req, res, next) => {
   try {
     const job = await JobApplication.findOneAndDelete({
       _id: req.params.id,
-      userId: req.user.id, // Ensures ownership — can only delete your own jobs
+      userId: req.user.id,
     });
 
     if (!job) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Job not found or not authorized." });
+      return res.status(404).json({ success: false, error: "Job not found or not authorized." });
     }
 
     res.status(200).json({ success: true, data: {} });
   } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
+    next(error);
   }
 };

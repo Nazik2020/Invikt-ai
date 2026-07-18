@@ -1,11 +1,10 @@
 const jwt = require("jsonwebtoken");
 const User = require("../../models/auth/User");
+const TokenBlacklist = require("../../models/TokenBlacklist");
 
-// Middleware to protect private routes — verifies JWT token
 const protect = async (req, res, next) => {
   let token;
 
-  // Check for Bearer token in Authorization header
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer ")
@@ -21,10 +20,16 @@ const protect = async (req, res, next) => {
   }
 
   try {
-    // Verify the token
+    const blacklisted = await TokenBlacklist.findOne({ token });
+    if (blacklisted) {
+      return res.status(401).json({
+        success: false,
+        error: "Token has been revoked. Please log in again.",
+      });
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Attach the user to the request object
     req.user = await User.findById(decoded.id);
 
     if (!req.user) {
@@ -34,16 +39,28 @@ const protect = async (req, res, next) => {
       });
     }
 
+    if (req.user.isDeactivated) {
+      return res.status(403).json({
+        success: false,
+        error: "Account has been suspended. Contact support.",
+      });
+    }
+
     next();
   } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({
+        success: false,
+        error: "Token expired. Please refresh your token.",
+      });
+    }
     return res.status(401).json({
       success: false,
-      error: "Not authorized. Token is invalid or expired.",
+      error: "Not authorized. Token is invalid.",
     });
   }
 };
 
-// Middleware to restrict access to admin role only
 const adminOnly = (req, res, next) => {
   if (req.user && req.user.role === "admin") {
     return next();

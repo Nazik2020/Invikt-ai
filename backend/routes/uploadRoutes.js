@@ -1,41 +1,56 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const multer = require('multer');
-const { uploadFileToBlob } = require('../utils/azureStorage');
-const { protect } = require('../middleware/auth/authMiddleware');
+const multer = require("multer");
+const { uploadFileToBlob } = require("../utils/azureStorage");
+const { protect } = require("../middleware/auth/authMiddleware");
+const { uploadValidation } = require("../middleware/validation");
 
-// Configure multer to use memory storage
+const ALLOWED_CONTAINERS = ["invikt-uploads", "resume-uploads", "portfolio-uploads"];
+const ALLOWED_MIMES = [
+  "image/jpeg", "image/png", "image/gif", "image/webp",
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+];
+
 const storage = multer.memoryStorage();
-const upload = multer({ 
+const upload = multer({
   storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5 MB limit
-  }
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (ALLOWED_MIMES.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("File type not allowed."), false);
+    }
+  },
 });
 
-// @desc    Upload file to Azure Blob Storage
-// @route   POST /api/upload
-// @access  Private
-router.post('/', protect, upload.single('file'), async (req, res) => {
+router.post("/", protect, upload.single("file"), uploadValidation, async (req, res, next) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
+      return res.status(400).json({ success: false, error: "No file uploaded." });
     }
 
     const { originalname, buffer, mimetype } = req.file;
-    const { container } = req.body; // allow frontend to specify container
+    const container = req.body.container || process.env.AZURE_STORAGE_CONTAINER_NAME;
 
-    // Upload to Azure
+    if (!ALLOWED_CONTAINERS.includes(container)) {
+      return res.status(400).json({ success: false, error: "Invalid container name." });
+    }
+
     const url = await uploadFileToBlob(buffer, originalname, mimetype, container);
 
-    res.status(200).json({ 
+    res.status(200).json({
       success: true,
       url,
-      message: 'File uploaded successfully' 
+      message: "File uploaded successfully.",
     });
   } catch (error) {
-    console.error('Upload Error:', error);
-    res.status(500).json({ message: 'Server Error during file upload', error: error.message });
+    if (error.message === "File type not allowed.") {
+      return res.status(400).json({ success: false, error: error.message });
+    }
+    next(error);
   }
 });
 

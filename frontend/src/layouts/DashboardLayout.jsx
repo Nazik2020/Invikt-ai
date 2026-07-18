@@ -4,7 +4,7 @@ import SideNavBar from "../components/common/SideNavBar";
 import Footer from "../components/common/Footer";
 import { SidebarProvider, useSidebar } from "../context/SidebarContext";
 
-import logo from "../assets/bg_removed_logo.png";
+import logo from "../assets/aspirev.png";
 
 // Inner layout that consumes the sidebar context
 const DashboardContent = () => {
@@ -32,7 +32,7 @@ const DashboardContent = () => {
       {/* Mobile Header (Hidden on md+) */}
       <div className="md:hidden flex items-center justify-between px-5 py-3 bg-white dark:bg-[#1c1c1f] border-b border-slate-200 dark:border-white/5 relative z-40">
         <Link to="/" className="flex items-center">
-          <img src={logo} alt="Invikt" className="h-8 w-auto object-contain dark:invert-0 dark:hue-rotate-0 invert hue-rotate-180 brightness-75 contrast-125 dark:brightness-100 dark:contrast-100" />
+          <img src={logo} alt="Invikt" className="h-20 w-auto object-contain dark:invert-0 dark:hue-rotate-0 invert hue-rotate-180 brightness-75 contrast-125 dark:brightness-100 dark:contrast-100" />
         </Link>
         <button
           onClick={toggle}

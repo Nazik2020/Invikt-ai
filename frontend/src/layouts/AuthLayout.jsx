@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import logo from "../assets/bg_removed_logo.png";
+import logo from "../assets/aspirev.png";
 
 const AuthLayout = ({ children, leftContent }) => {
   return (
@@ -23,8 +23,8 @@ const AuthLayout = ({ children, leftContent }) => {
             <Link to="/" className="inline-block -ml-2">
               <img
                 src={logo}
-                alt="Invikt"
-                className="h-10 w-auto object-contain dark:invert-0 dark:hue-rotate-0 invert hue-rotate-180 brightness-75 contrast-125 dark:brightness-100 dark:contrast-100"
+                alt="Aspirev"
+                className="h-16 md:h-20 w-auto object-contain invert dark:invert-0"
               />
             </Link>
           </div>

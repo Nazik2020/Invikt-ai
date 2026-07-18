@@ -7,7 +7,7 @@ const Portfolio = require("../../models/Portfolio");
 // @desc    Get admin overview dashboard data
 // @route   GET /api/admin/overview
 // @access  Private/Admin
-exports.getOverview = async (req, res) => {
+exports.getOverview = async (req, res, next) => {
   try {
     const now = new Date();
     const thirtyDaysAgo = new Date(now);
@@ -138,15 +138,14 @@ exports.getOverview = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error in getOverview:", error);
-    res.status(500).json({ success: false, error: "Server error" });
+    next(error);
   }
 };
 
 // @desc    Run system health check
 // @route   GET /api/admin/overview/health
 // @access  Private/Admin
-exports.getHealthCheck = async (req, res) => {
+exports.getHealthCheck = async (req, res, next) => {
   try {
     const mongoReady = mongoose.connection.readyState === 1;
     const mongoPing = mongoReady
@@ -163,15 +162,7 @@ exports.getHealthCheck = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(200).json({
-      success: true,
-      data: {
-        api: true,
-        database: false,
-        smtp: true,
-        cache: true,
-      },
-    });
+    next(error);
   }
 };
 

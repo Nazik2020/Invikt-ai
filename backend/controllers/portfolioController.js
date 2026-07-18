@@ -1,73 +1,83 @@
-const Portfolio = require('../models/Portfolio');
+const Portfolio = require("../models/Portfolio");
 
-// @desc    Get user portfolio
-// @route   GET /api/portfolio
-// @access  Private
-const getPortfolio = async (req, res) => {
+const PORTFOLIO_ALLOWED_FIELDS = [
+  "personalInfo",
+  "socialLinks",
+  "experience",
+  "technologies",
+  "projects",
+  "certifications",
+  "volunteering",
+  "isPublished",
+  "customUrl",
+];
+
+const pickAllowed = (body) => {
+  const picked = {};
+  for (const field of PORTFOLIO_ALLOWED_FIELDS) {
+    if (body[field] !== undefined) {
+      picked[field] = body[field];
+    }
+  }
+  return picked;
+};
+
+const getPortfolio = async (req, res, next) => {
   try {
-    let portfolio = await Portfolio.findOne({ user: req.user.id });
-    
-    // If no portfolio exists, return an empty template
+    const portfolio = await Portfolio.findOne({ user: req.user.id });
     if (!portfolio) {
       return res.status(200).json({ message: "No portfolio found", data: null });
     }
-    
     res.status(200).json(portfolio);
   } catch (error) {
-    res.status(500).json({ message: 'Server Error', error: error.message });
+    next(error);
   }
 };
 
-// @desc    Update user portfolio
-// @route   PUT /api/portfolio
-// @access  Private
-const updatePortfolio = async (req, res) => {
+const updatePortfolio = async (req, res, next) => {
   try {
+    const allowed = pickAllowed(req.body);
+
     let portfolio = await Portfolio.findOne({ user: req.user.id });
 
     if (portfolio) {
-      // Update existing
       portfolio = await Portfolio.findOneAndUpdate(
         { user: req.user.id },
-        { $set: req.body },
-        { new: true }
+        { $set: allowed },
+        { new: true, runValidators: true }
       );
     } else {
-      // Create new
       portfolio = await Portfolio.create({
         user: req.user.id,
-        ...req.body
+        ...allowed,
       });
     }
 
     res.status(200).json(portfolio);
   } catch (error) {
-    res.status(500).json({ message: 'Server Error', error: error.message });
+    next(error);
   }
 };
 
-// @desc    Get public portfolio by custom URL
-// @route   GET /api/portfolio/public/:customUrl
-// @access  Public
-const getPublicPortfolio = async (req, res) => {
+const getPublicPortfolio = async (req, res, next) => {
   try {
-    const portfolio = await Portfolio.findOne({ 
+    const portfolio = await Portfolio.findOne({
       customUrl: req.params.customUrl,
-      isPublished: true 
-    }).populate('user', 'name email isDeactivated');
+      isPublished: true,
+    }).populate("user", "firstName lastName email isDeactivated");
 
     if (!portfolio || !portfolio.user || portfolio.user.isDeactivated) {
-      return res.status(404).json({ message: 'Portfolio not found or not public' });
+      return res.status(404).json({ message: "Portfolio not found or not public" });
     }
 
     res.status(200).json(portfolio);
   } catch (error) {
-    res.status(500).json({ message: 'Server Error', error: error.message });
+    next(error);
   }
 };
 
 module.exports = {
   getPortfolio,
   updatePortfolio,
-  getPublicPortfolio
+  getPublicPortfolio,
 };

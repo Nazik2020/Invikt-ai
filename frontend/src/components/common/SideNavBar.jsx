@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink, Link } from "react-router-dom";
-import logo from "../../assets/bg_removed_logo.png";
-import logoIcon from "../../assets/bg_removed_logo_only.png";
+import logo from "../../assets/aspirev.png";
+import logoIcon from "../../assets/aspirev.png";
 import { useSidebar } from "../../context/SidebarContext";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -72,11 +72,11 @@ const SideNavBar = () => {
         {/* Collapsed: icon-only logo centered above toggle */}
         {isCollapsed ? (
           <>
-            <Link to="/" className="hover:opacity-80 transition-opacity">
+            <Link to="/" className="hover:opacity-80 transition-opacity flex justify-center">
               <img
                 src={logoIcon}
-                alt="Invikt"
-                className="w-9 h-9 object-contain dark:invert-0 dark:hue-rotate-0 invert hue-rotate-180 brightness-75 contrast-125 dark:brightness-100 dark:contrast-100"
+                alt="Aspirev"
+                className="h-6 w-auto object-contain invert dark:invert-0 scale-[1.5]"
               />
             </Link>
             <button
@@ -101,8 +101,8 @@ const SideNavBar = () => {
             >
               <img
                 src={logo}
-                alt="Invikt"
-                className="h-10 w-auto object-contain dark:invert-0 dark:hue-rotate-0 invert hue-rotate-180 brightness-75 contrast-125 dark:brightness-100 dark:contrast-100"
+                alt="Aspirev"
+                className="h-8 w-auto object-contain invert dark:invert-0 scale-[1.5] origin-left"
               />
             </Link>
             <button

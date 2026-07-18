@@ -3,7 +3,6 @@ const QRCode = require("qrcode");
 const Portfolio = require("../../models/Portfolio");
 const PortfolioAnalytics = require("../../models/share/PortfolioAnalytics");
 
-// Helper to optionally get user ID from Authorization header
 const getOptionalUserId = (req) => {
   if (
     req.headers.authorization &&
@@ -20,10 +19,7 @@ const getOptionalUserId = (req) => {
   return null;
 };
 
-// @desc    Record portfolio view
-// @route   POST /api/portfolio/share/record-view/:customUrl
-// @access  Public
-const recordView = async (req, res) => {
+const recordView = async (req, res, next) => {
   try {
     const { customUrl } = req.params;
     const portfolio = await Portfolio.findOne({ customUrl });
@@ -32,7 +28,6 @@ const recordView = async (req, res) => {
       return res.status(404).json({ success: false, message: "Portfolio not found" });
     }
 
-    // Optional Check: Do not record if the viewer is the owner of the portfolio
     const viewerId = getOptionalUserId(req);
     if (viewerId && viewerId.toString() === portfolio.user.toString()) {
       return res.status(200).json({ success: true, message: "View skipped (owner)" });
@@ -40,19 +35,16 @@ const recordView = async (req, res) => {
 
     await PortfolioAnalytics.create({
       portfolio: portfolio._id,
-      eventType: "view"
+      eventType: "view",
     });
 
     res.status(201).json({ success: true, message: "View recorded successfully" });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Server Error", error: error.message });
+    next(error);
   }
 };
 
-// @desc    Record portfolio link click
-// @route   POST /api/portfolio/share/record-click/:customUrl
-// @access  Public
-const recordClick = async (req, res) => {
+const recordClick = async (req, res, next) => {
   try {
     const { customUrl } = req.params;
     const portfolio = await Portfolio.findOne({ customUrl });
@@ -61,7 +53,6 @@ const recordClick = async (req, res) => {
       return res.status(404).json({ success: false, message: "Portfolio not found" });
     }
 
-    // Optional Check: Do not record if the viewer is the owner of the portfolio
     const viewerId = getOptionalUserId(req);
     if (viewerId && viewerId.toString() === portfolio.user.toString()) {
       return res.status(200).json({ success: true, message: "Click skipped (owner)" });
@@ -69,19 +60,16 @@ const recordClick = async (req, res) => {
 
     await PortfolioAnalytics.create({
       portfolio: portfolio._id,
-      eventType: "click"
+      eventType: "click",
     });
 
     res.status(201).json({ success: true, message: "Click recorded successfully" });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Server Error", error: error.message });
+    next(error);
   }
 };
 
-// @desc    Get portfolio sharing & analytics stats
-// @route   GET /api/portfolio/share/stats
-// @access  Private
-const getShareStats = async (req, res) => {
+const getShareStats = async (req, res, next) => {
   try {
     const portfolio = await Portfolio.findOne({ user: req.user.id });
 
@@ -89,25 +77,23 @@ const getShareStats = async (req, res) => {
       return res.status(404).json({ success: false, message: "Portfolio not found" });
     }
 
-    // Calculate stats
     const totalViews = await PortfolioAnalytics.countDocuments({
       portfolio: portfolio._id,
-      eventType: "view"
+      eventType: "view",
     });
 
     const linkClicks = await PortfolioAnalytics.countDocuments({
       portfolio: portfolio._id,
-      eventType: "click"
+      eventType: "click",
     });
 
-    // Views this week (last 7 days)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
     const viewsThisWeek = await PortfolioAnalytics.countDocuments({
       portfolio: portfolio._id,
       eventType: "view",
-      timestamp: { $gte: sevenDaysAgo }
+      timestamp: { $gte: sevenDaysAgo },
     });
 
     res.status(200).json({
@@ -115,18 +101,15 @@ const getShareStats = async (req, res) => {
       stats: {
         totalViews,
         linkClicks,
-        viewsThisWeek
-      }
+        viewsThisWeek,
+      },
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Server Error", error: error.message });
+    next(error);
   }
 };
 
-// @desc    Generate and retrieve QR Code for the portfolio
-// @route   GET /api/portfolio/share/qrcode
-// @access  Private
-const generateQRCode = async (req, res) => {
+const generateQRCode = async (req, res, next) => {
   try {
     const portfolio = await Portfolio.findOne({ user: req.user.id });
 
@@ -137,24 +120,23 @@ const generateQRCode = async (req, res) => {
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
     const publicUrl = `${frontendUrl}/p/${portfolio.customUrl}`;
 
-    // Create the QR Code data URL (base64 PNG)
     const qrCodeUrl = await QRCode.toDataURL(publicUrl, {
-      errorCorrectionLevel: 'H',
+      errorCorrectionLevel: "H",
       margin: 2,
       width: 300,
       color: {
-        dark: '#000000',
-        light: '#FFFFFF'
-      }
+        dark: "#000000",
+        light: "#FFFFFF",
+      },
     });
 
     res.status(200).json({
       success: true,
       qrCodeUrl,
-      publicUrl
+      publicUrl,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Server Error", error: error.message });
+    next(error);
   }
 };
 
@@ -162,5 +144,5 @@ module.exports = {
   recordView,
   recordClick,
   getShareStats,
-  generateQRCode
+  generateQRCode,
 };

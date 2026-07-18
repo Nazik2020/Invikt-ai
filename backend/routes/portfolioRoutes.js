@@ -1,14 +1,13 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { getPortfolio, updatePortfolio, getPublicPortfolio } = require('../controllers/portfolioController');
-const { protect } = require('../middleware/auth/authMiddleware');
+const { getPortfolio, updatePortfolio, getPublicPortfolio } = require("../controllers/portfolioController");
+const { protect } = require("../middleware/auth/authMiddleware");
+const { portfolioUpdateValidation, portfolioShareValidation } = require("../middleware/validation");
 
-// Private routes (require authentication)
-router.route('/')
+router.route("/")
   .get(protect, getPortfolio)
-  .put(protect, updatePortfolio);
+  .put(protect, portfolioUpdateValidation, updatePortfolio);
 
-// Public routes
-router.get('/public/:customUrl', getPublicPortfolio);
+router.get("/public/:customUrl", portfolioShareValidation, getPublicPortfolio);
 
 module.exports = router;

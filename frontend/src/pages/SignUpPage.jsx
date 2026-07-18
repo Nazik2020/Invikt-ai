@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../layouts/AuthLayout";
-import logo from "../assets/bg_removed_logo.png";
+import logo from "../assets/aspirev.png";
 import { useAuth } from "../context/AuthContext";
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
@@ -184,7 +184,7 @@ const SignUpPage = () => {
     <div className="flex flex-col h-full">
       <div>
         <Link to="/" className="inline-block mb-8 -ml-2">
-          <img src={logo} alt="Invikt" className="h-9 md:h-11 w-auto object-contain" />
+          <img src={logo} alt="Aspirev" className="h-16 md:h-20 w-auto object-contain invert dark:invert-0" />
         </Link>
         <div className="max-w-lg">
           <h1 className="text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white leading-[1.1] tracking-tight mb-8">

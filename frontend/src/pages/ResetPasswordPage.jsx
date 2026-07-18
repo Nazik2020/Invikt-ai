@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import AuthLayout from "../layouts/AuthLayout";
-import logo from "../assets/bg_removed_logo.png";
-import elena from "../assets/bg_removed_logo_only.png"; // Fallback for avatar
+import logo from "../assets/aspirev.png";
+import elena from "../assets/aspirev.png"; // Fallback for avatar
 
 const ResetPasswordPage = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -14,8 +14,8 @@ const ResetPasswordPage = () => {
         <Link to="/" className="inline-block mb-8 -ml-2">
           <img
             src={logo}
-            alt="Invikt"
-            className="h-10 md:h-12 w-auto object-contain"
+            alt="Aspirev"
+            className="h-16 md:h-20 w-auto object-contain invert dark:invert-0"
           />
         </Link>
 

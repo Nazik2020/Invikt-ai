@@ -5,7 +5,7 @@ const User = require("../../models/auth/User");
 // @route   GET /api/admin/applications
 // @access  Private/Admin
 // @query   range = "7d" | "30d" | "90d" | "all"
-exports.getApplicationAnalytics = async (req, res) => {
+exports.getApplicationAnalytics = async (req, res, next) => {
   try {
     const range = req.query.range || "30d";
     const dateFilter = buildDateFilter(range);
@@ -179,8 +179,7 @@ exports.getApplicationAnalytics = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error in getApplicationAnalytics:", error);
-    res.status(500).json({ success: false, error: "Server error" });
+    next(error);
   }
 };
 
@@ -188,7 +187,7 @@ exports.getApplicationAnalytics = async (req, res) => {
 // @route   GET /api/admin/applications/export
 // @access  Private/Admin
 // @query   range = "7d" | "30d" | "90d" | "all"
-exports.exportApplications = async (req, res) => {
+exports.exportApplications = async (req, res, next) => {
   try {
     const range = req.query.range || "30d";
     const dateFilter = buildDateFilter(range);
@@ -221,8 +220,7 @@ exports.exportApplications = async (req, res) => {
       count: csvRows.length,
     });
   } catch (error) {
-    console.error("Error in exportApplications:", error);
-    res.status(500).json({ success: false, error: "Server error" });
+    next(error);
   }
 };
 

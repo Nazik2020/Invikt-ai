@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import logo from "../../../assets/bg_removed_logo.png";
-import logoIcon from "../../../assets/bg_removed_logo_only.png";
+import logo from "../../../assets/aspirev.png";
+import logoIcon from "../../../assets/aspirev.png";
 
 const AdminSidebar = ({ isCollapsed, toggle }) => {
   const location = useLocation();
@@ -34,15 +34,15 @@ const AdminSidebar = ({ isCollapsed, toggle }) => {
             /* Collapsed → icon-only logo */
             <img
               src={logoIcon}
-              alt="Invikt"
-              className="w-9 h-9 object-contain shrink-0"
+              alt="Aspirev"
+              className="h-6 w-auto object-contain shrink-0 invert dark:invert-0 scale-[1.5]"
             />
           ) : (
             /* Expanded → full logo */
             <img
               src={logo}
-              alt="Invikt"
-              className="h-8 w-auto object-contain shrink-0 max-w-[120px]"
+              alt="Aspirev"
+              className="h-8 w-auto object-contain shrink-0 max-w-[280px] invert dark:invert-0 scale-[1.5] origin-left"
             />
           )}
           {!isCollapsed && (

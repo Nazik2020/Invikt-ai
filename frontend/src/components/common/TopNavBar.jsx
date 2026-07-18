@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import logo from "../../assets/bg_removed_logo.png";
+import logo from "../../assets/aspirev.png";
 
 const TopNavBar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -13,8 +13,8 @@ const TopNavBar = () => {
       >
         <img
           src={logo}
-          alt="Invikt Logo"
-          className="h-8 md:h-10 w-auto object-contain dark:invert-0 dark:hue-rotate-0 invert hue-rotate-180 brightness-75 contrast-125 dark:brightness-100 dark:contrast-100"
+          alt="Aspirev Logo"
+          className="h-8 md:h-10 w-auto object-contain invert dark:invert-0 scale-[1.5] md:scale-[2] origin-left"
         />
       </Link>
 

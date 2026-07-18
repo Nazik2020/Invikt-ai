@@ -10,7 +10,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import * as htmlToImage from "html-to-image";
-import logo from "../../assets/bg_removed_logo.png";
+import logo from "../../assets/aspirev.png";
 
 // ─── Custom Stage Node ────────────────────────────────────────────────────────
 const StageNode = ({ data }) => {
@@ -186,9 +186,9 @@ const RoadmapVisualizer = ({ roadmap }) => {
 
       {/* Brand Watermark (visible in download) */}
       <div className="absolute bottom-8 left-8 flex items-center gap-4 z-10 pointer-events-none bg-white/80 p-3 rounded-xl border border-slate-200 shadow-sm backdrop-blur-sm">
-         <img src={logo} alt="Invikt AI" className="h-10 w-auto object-contain drop-shadow-sm" />
+         <img src={logo} alt="Aspirev" className="h-16 w-auto object-contain drop-shadow-sm invert" />
          <div>
-            <h1 className="text-xl font-black text-slate-900 tracking-tight leading-none">Invikt AI</h1>
+            <h1 className="text-xl font-black text-slate-900 tracking-tight leading-none">Aspirev</h1>
             <p className="text-[0.65rem] uppercase tracking-widest text-slate-600 font-bold mt-1">Official Career Roadmap</p>
          </div>
       </div>
