@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import RoadmapDiagram from "../roadmap/RoadmapDiagram";
 import { useAuth } from "../../context/AuthContext";
 import { roadmaps } from "../../data/roadmaps.js";
+import { API_URL } from "../../config/api";
 
 const SkillRow = ({ skill, onToggle }) => {
   return (
@@ -197,7 +198,7 @@ const RoadmapDetail = () => {
       }
 
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/roadmaps/${id}/progress`, {
+        const res = await fetch(`${API_URL}/roadmaps/${id}/progress`, {
           headers: getAuthHeaders()
         });
         const progressData = await res.json();
@@ -269,7 +270,7 @@ const RoadmapDetail = () => {
 
     // 4. Save to backend
     try {
-      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/roadmaps/${id}/progress`, {
+      await fetch(`${API_URL}/roadmaps/${id}/progress`, {
         method: "PUT",
         headers: {
           ...getAuthHeaders(),

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { roadmaps } from "../data/roadmaps.js";
+import { API_URL } from "../config/api";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const DashboardPage = () => {
   React.useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await authFetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/dashboard`);
+        const response = await authFetch(`${API_URL}/dashboard`);
         const data = await response.json();
         
         if (data.success && data.data) {
