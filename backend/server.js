@@ -55,14 +55,14 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// ─── Body Parsing (must be before sanitize/xss) ─────────────────────────────
+app.use(express.json({ limit: "2mb" }));
+
 // ─── NoSQL Injection Protection ──────────────────────────────────────────────
 app.use(sanitize);
 
 // ─── XSS Protection ──────────────────────────────────────────────────────────
 app.use(xssClean);
-
-// ─── Body Parsing ────────────────────────────────────────────────────────────
-app.use(express.json({ limit: "2mb" }));
 
 // ─── Route Imports ────────────────────────────────────────────────────────────
 const authRoutes = require("./routes/auth/authRoutes");
