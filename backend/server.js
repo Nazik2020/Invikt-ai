@@ -3,7 +3,6 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
-const mongoSanitize = require("express-mongo-sanitize");
 const connectDB = require("./config/db");
 const errorHandler = require("./middleware/errorHandler");
 const httpsRedirect = require("./middleware/httpsRedirect");
@@ -18,18 +17,23 @@ const app = express();
 // ─── HTTPS Redirect (production) ─────────────────────────────────────────────
 app.use(httpsRedirect);
 
+// ─── CORS — must be FIRST so preflight OPTIONS always gets headers ───────────
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://mango-field-0f043dd0f.7.azurestaticapps.net",
+    "https://invikt-backend.onrender.com",
+    process.env.FRONTEND_URL,
+  ].filter(Boolean),
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
 // ─── Security Headers ────────────────────────────────────────────────────────
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "http://localhost:5000", "https://mango-field-0f043dd0f.7.azurestaticapps.net"],
-    },
-  },
+  crossOriginResourcePolicy: { policy: "cross-origin" },
   crossOriginEmbedderPolicy: false,
 }));
 
@@ -57,17 +61,7 @@ app.use(sanitize);
 // ─── XSS Protection ──────────────────────────────────────────────────────────
 app.use(xssClean);
 
-// ─── Core Middleware ──────────────────────────────────────────────────────────
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "http://localhost:3000",
-    "https://mango-field-0f043dd0f.7.azurestaticapps.net",
-    "https://invikt-backend.onrender.com",
-    process.env.FRONTEND_URL,
-  ].filter(Boolean),
-  credentials: true,
-}));
+// ─── Body Parsing ────────────────────────────────────────────────────────────
 app.use(express.json({ limit: "2mb" }));
 
 // ─── Route Imports ────────────────────────────────────────────────────────────
@@ -111,6 +105,6 @@ app.use(errorHandler);
 
 // ─── Start Server ─────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
