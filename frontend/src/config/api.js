@@ -9,7 +9,7 @@ const getApiUrl = () => {
     return "http://localhost:5000/api";
   }
 
-  return "https://invikt-backend.onrender.com/api";
+  return "https://aspirev-backend-bhe7g2fdabbycbap.eastus-01.azurewebsites.net/api";
 };
 
 export const API_URL = getApiUrl();
