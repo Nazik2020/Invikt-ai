@@ -249,8 +249,6 @@ const JobTrackerPage = () => {
   const filterDropdownRef = useRef(null);
   const modalDropdownRef = useRef(null);
   const drawerDropdownRef = useRef(null);
-  const kanbanContainerRef = useRef(null);
-  const columnRefs = useRef({});
 
   // Auto-scroll logic is now inside KanbanBoard
 
@@ -748,67 +746,109 @@ const JobTrackerPage = () => {
 
       {/* ── Stats Summary Row ── */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="p-4 rounded-2xl bg-white dark:bg-[#1e1f23]/60 border border-slate-200 dark:border-white/5 flex flex-col items-center justify-center text-center">
-          <span className="text-[0.6rem] text-slate-400 dark:text-white/30 uppercase tracking-widest font-black mb-1">
-            Total Apps
-          </span>
-          <span className="text-2xl font-black text-slate-900 dark:text-white">
-            {stats.total}
-          </span>
+        {/* Total Apps */}
+        <div className="p-4 rounded-2xl bg-white dark:bg-[#1e1f23]/60 border border-slate-200 dark:border-white/5 flex items-center gap-3.5 shadow-sm">
+          <div className="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-violet-400 text-[20px]">
+              work
+            </span>
+          </div>
+          <div>
+            <span className="text-[0.6rem] text-slate-400 dark:text-white/30 uppercase tracking-widest font-black block">
+              Total Apps
+            </span>
+            <span className="text-2xl font-black text-slate-900 dark:text-white leading-none mt-0.5 block">
+              {stats.total}
+            </span>
+          </div>
         </div>
-        <div className="p-4 rounded-2xl bg-white dark:bg-[#1e1f23]/60 border border-slate-200 dark:border-white/5 flex flex-col items-center justify-center text-center">
-          <span className="text-[0.6rem] text-slate-400 dark:text-white/30 uppercase tracking-widest font-black mb-1">
-            In Progress
-          </span>
-          <span className="text-2xl font-black text-slate-900 dark:text-white">
-            {stats.inProgress}
-          </span>
+
+        {/* In Progress */}
+        <div className="p-4 rounded-2xl bg-white dark:bg-[#1e1f23]/60 border border-slate-200 dark:border-white/5 flex items-center gap-3.5 shadow-sm">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-amber-400 text-[20px]">
+              schedule
+            </span>
+          </div>
+          <div>
+            <span className="text-[0.6rem] text-slate-400 dark:text-white/30 uppercase tracking-widest font-black block">
+              In Progress
+            </span>
+            <span className="text-2xl font-black text-slate-900 dark:text-white leading-none mt-0.5 block">
+              {stats.inProgress}
+            </span>
+          </div>
         </div>
-        <div className="p-4 rounded-2xl bg-white dark:bg-[#1e1f23]/60 border border-slate-200 dark:border-white/5 flex flex-col items-center justify-center text-center">
-          <span className="text-[0.6rem] text-slate-400 dark:text-white/30 uppercase tracking-widest font-black mb-1">
-            Interviews
-          </span>
-          <span className="text-2xl font-black text-slate-900 dark:text-white">
-            {stats.interviews}
-          </span>
+
+        {/* Interviews */}
+        <div className="p-4 rounded-2xl bg-white dark:bg-[#1e1f23]/60 border border-slate-200 dark:border-white/5 flex items-center gap-3.5 shadow-sm">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-emerald-400 text-[20px]">
+              calendar_month
+            </span>
+          </div>
+          <div>
+            <span className="text-[0.6rem] text-slate-400 dark:text-white/30 uppercase tracking-widest font-black block">
+              Interviews
+            </span>
+            <span className="text-2xl font-black text-slate-900 dark:text-white leading-none mt-0.5 block">
+              {stats.interviews}
+            </span>
+          </div>
         </div>
-        <div className="p-4 rounded-2xl bg-white dark:bg-[#1e1f23]/60 border border-slate-200 dark:border-white/5 flex flex-col items-center justify-center text-center">
-          <span className="text-[0.6rem] text-slate-400 dark:text-white/30 uppercase tracking-widest font-black mb-1">
-            Offers
-          </span>
-          <span className="text-2xl font-black text-slate-900 dark:text-white">
-            {stats.offers}
-          </span>
+
+        {/* Offers */}
+        <div className="p-4 rounded-2xl bg-white dark:bg-[#1e1f23]/60 border border-slate-200 dark:border-white/5 flex items-center gap-3.5 shadow-sm">
+          <div className="w-10 h-10 rounded-xl bg-fuchsia-500/10 border border-fuchsia-500/20 flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-fuchsia-400 text-[20px]">
+              emoji_events
+            </span>
+          </div>
+          <div>
+            <span className="text-[0.6rem] text-slate-400 dark:text-white/30 uppercase tracking-widest font-black block">
+              Offers
+            </span>
+            <span className="text-2xl font-black text-slate-900 dark:text-white leading-none mt-0.5 block">
+              {stats.offers}
+            </span>
+          </div>
         </div>
-        <div className="col-span-2 md:col-span-1 p-4 rounded-2xl bg-white dark:bg-[#1e1f23]/60 border border-slate-200 dark:border-white/5 flex flex-col items-center justify-center text-center">
-          <span className="text-[0.6rem] text-slate-400 dark:text-white/30 uppercase tracking-widest font-black mb-1">
-            Success Rate
-          </span>
-          <div className="relative w-12 h-12 flex items-center justify-center mt-1">
+
+        {/* Success Rate */}
+        <div className="col-span-2 md:col-span-1 p-4 rounded-2xl bg-white dark:bg-[#1e1f23]/60 border border-slate-200 dark:border-white/5 flex items-center justify-between shadow-sm">
+          <div>
+            <span className="text-[0.6rem] text-slate-400 dark:text-white/30 uppercase tracking-widest font-black block mb-0.5">
+              Success Rate
+            </span>
+            <span className="text-2xl font-black text-slate-900 dark:text-white leading-none block">
+              {stats.successRate}%
+            </span>
+          </div>
+          <div className="relative w-11 h-11 flex items-center justify-center shrink-0">
             <svg className="absolute inset-0 w-full h-full transform -rotate-90">
               <circle
-                cx="24"
-                cy="24"
-                r="20"
-                stroke="currentColor" strokeWidth="3.5" className="text-slate-100 dark:text-white/5"
+                cx="22"
+                cy="22"
+                r="18"
+                stroke="currentColor" strokeWidth="3" className="text-slate-100 dark:text-white/5"
                 fill="transparent"
               />
               <circle
-                cx="24"
-                cy="24"
-                r="20"
-                stroke="#8b5cf6"
-                strokeWidth="3.5"
+                cx="22"
+                cy="22"
+                r="18"
+                stroke="#00daf3"
+                strokeWidth="3"
                 fill="transparent"
-                strokeDasharray={2 * Math.PI * 20}
+                strokeDasharray={2 * Math.PI * 18}
                 strokeDashoffset={
-                  2 * Math.PI * 20 * (1 - stats.successRate / 100)
+                  2 * Math.PI * 18 * (1 - stats.successRate / 100)
                 }
                 strokeLinecap="round"
               />
             </svg>
-            <span className="text-[0.75rem] font-black text-slate-900 dark:text-white">
-              {stats.successRate}%
+            <span className="material-symbols-outlined text-cyan-400 text-[15px]">
+              percent
             </span>
           </div>
         </div>
@@ -967,45 +1007,6 @@ const JobTrackerPage = () => {
           setApps={setApps}
         />
       )}
-
-      {/* ── Health Insight Banner ── */}
-      <div className="rounded-2xl border border-slate-200 dark:border-white/8 bg-white dark:bg-[#1e1f23] p-6 flex flex-col md:flex-row items-start md:items-center gap-6 justify-between">
-        <div className="flex gap-4 items-start">
-          <div className="w-12 h-12 rounded-2xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center shrink-0">
-            <span
-              className="material-symbols-outlined text-violet-400 text-[20px]"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              psychology
-            </span>
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-[0.95rem] font-bold text-white/95">
-              Application Health Insight
-            </h3>
-            <p className="text-slate-500 dark:text-white/40 text-[0.8rem] leading-relaxed max-w-2xl">
-              Based on your recent activity, your interview conversion rate has
-              increased by{" "}
-              <strong className="text-slate-900 dark:text-white">18%</strong>.
-              We recommend prioritizing the{" "}
-              <strong className="text-slate-900 dark:text-white">
-                Next.js Visual Architect
-              </strong>{" "}
-              offer negotiations as it aligns 94% with your target compensation
-              and role level.
-            </p>
-          </div>
-        </div>
-        <button className="shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:bg-white/10 border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:border-white/20 text-[0.8rem] font-bold text-slate-900 dark:text-white transition-all whitespace-nowrap">
-          View Analysis
-          <span
-            className="material-symbols-outlined text-[16px]"
-            style={{ fontVariationSettings: "'FILL' 0, 'wght' 300" }}
-          >
-            auto_awesome
-          </span>
-        </button>
-      </div>
 
       {/* ── Modal Overlay Form (Add Application) ── */}
       {showAddModal &&

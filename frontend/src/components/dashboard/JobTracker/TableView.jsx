@@ -232,8 +232,21 @@ const TableView = ({ stages, filteredApps, setSelectedApp, apps, setApps }) => {
                   <td className="py-4 px-4 text-[0.85rem] text-slate-500 dark:text-white/60">
                     {app.source || "Direct"}
                   </td>
-                  <td className="py-4 px-4 text-[0.8rem] text-slate-500 dark:text-white/40 italic truncate max-w-[200px]">
-                    {app.notes || "No notes"}
+                  <td className="py-4 px-4 relative group">
+                    <div
+                      className="text-[0.8rem] text-slate-500 dark:text-white/40 italic truncate max-w-[200px] cursor-help"
+                      title={app.notes || "No notes"}
+                    >
+                      {app.notes || "No notes"}
+                    </div>
+                    {app.notes && (
+                      <div className="absolute left-4 bottom-full mb-2 hidden group-hover:block z-30 w-64 p-3 rounded-xl bg-slate-900 dark:bg-[#121316] text-white text-xs shadow-2xl border border-slate-700 dark:border-white/10 whitespace-normal leading-relaxed pointer-events-none">
+                        <div className="font-semibold text-violet-400 text-[0.65rem] uppercase tracking-wider mb-1">
+                          Full Note
+                        </div>
+                        {app.notes}
+                      </div>
+                    )}
                   </td>
                   <td className="py-4 px-4 text-right">
                     <button
