@@ -24,7 +24,7 @@ There is **no test framework** configured in either package. No jest, vitest, or
 
 ## Critical Tech Quirks
 
-- **Express 5** (not v4): async errors propagate automatically to error handler — no `try/catch` wrappers needed in route handlers. `app.listen` returns a Promise.
+- **Express 5** (not v4): async errors propagate automatically to error handler — no `try/catch` wrappers needed in route handlers. Rejected promises from route handlers are forwarded to the error middleware automatically.
 - **Tailwind CSS v4**: uses `@import "tailwindcss"` and `@theme {}` in `src/app/globals.css`. There is **no `tailwind.config.js`** — all customization lives in the CSS file's `@theme` block. PostCSS plugin: `@tailwindcss/postcss`.
 - **Dark mode is default**: class-based via `.dark` on `<html>`. Theme stored in `localStorage`, toggled by inline script in root layout (`src/app/layout.jsx`).
 - **No TypeScript anywhere**: entire codebase is plain JS/JSX.
