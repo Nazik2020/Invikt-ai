@@ -1,6 +1,10 @@
 const getApiUrl = () => {
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
+  if (typeof window === "undefined") {
+    return process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+  }
+
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
   }
 
   const { hostname } = window.location;

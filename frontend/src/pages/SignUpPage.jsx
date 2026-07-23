@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import AuthLayout from "../layouts/AuthLayout";
 import logo from "../assets/aspirev.png";
 import { useAuth } from "../context/AuthContext";
@@ -113,7 +114,7 @@ const SignUpPage = () => {
   const [passwordFocused, setPasswordFocused] = useState(false);
 
   const { register } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const set = (key) => (e) => {
     const val = key === "username" ? e.target.value.replace(/\s/g, "") : e.target.value;
@@ -164,12 +165,7 @@ const SignUpPage = () => {
         fields.username.trim(), fields.email.trim(), fields.password
       );
       if (result.success) {
-        navigate("/signin", { 
-          state: { 
-            message: "Account created successfully! Please sign in to continue.",
-            email: fields.email.trim()
-          } 
-        });
+        router.push(`/signin?message=${encodeURIComponent("Account created successfully! Please sign in to continue.")}&email=${encodeURIComponent(fields.email.trim())}`);
       } else {
         setServerError(result.error || "Registration failed. Please try again.");
       }
@@ -183,8 +179,8 @@ const SignUpPage = () => {
   const leftContent = (
     <div className="flex flex-col h-full">
       <div>
-        <Link to="/" className="inline-block mb-8 -ml-2">
-          <img src={logo} alt="Aspirev" className="h-16 md:h-20 w-auto object-contain invert dark:invert-0" />
+        <Link href="/" className="inline-block mb-8 -ml-2">
+          <img src={logo.src} alt="Aspirev" className="h-16 md:h-20 w-auto object-contain invert dark:invert-0" />
         </Link>
         <div className="max-w-lg">
           <h1 className="text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white leading-[1.1] tracking-tight mb-8">
@@ -364,7 +360,7 @@ const SignUpPage = () => {
         <div className="mt-5 text-center">
           <p className="text-sm text-slate-500 dark:text-white/50">
             Already have an account?{" "}
-            <Link to="/signin" className="text-slate-900 dark:text-white font-bold hover:text-violet-400 transition-colors">Sign In</Link>
+            <Link href="/signin" className="text-slate-900 dark:text-white font-bold hover:text-violet-400 transition-colors">Sign In</Link>
           </p>
         </div>
         <div className="mt-6 text-center">

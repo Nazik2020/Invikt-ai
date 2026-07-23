@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
 import AdminSidebar from "../components/admin/layout/AdminSidebar";
 import AdminHeader from "../components/admin/layout/AdminHeader";
 import Footer from "../components/common/Footer";
 
-const AdminLayout = () => {
+const AdminLayout = ({ children }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -57,7 +56,7 @@ const AdminLayout = () => {
         {/* Scrollable page body */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col justify-between">
           <main className="flex-grow p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full">
-            <Outlet />
+            {children}
           </main>
           <Footer className="bg-transparent dark:bg-transparent" />
         </div>

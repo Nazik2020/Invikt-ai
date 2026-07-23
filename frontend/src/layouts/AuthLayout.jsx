@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import logo from "../assets/aspirev.png";
 
 const AuthLayout = ({ children, leftContent }) => {
@@ -20,9 +20,9 @@ const AuthLayout = ({ children, leftContent }) => {
         <div className="w-full max-w-[420px] pt-8 lg:pt-0 relative z-10 flex flex-col h-full lg:h-auto">
           {/* Mobile Logo */}
           <div className="lg:hidden mb-12">
-            <Link to="/" className="inline-block -ml-2">
+            <Link href="/" className="inline-block -ml-2">
               <img
-                src={logo}
+                src={logo.src}
                 alt="Aspirev"
                 className="h-16 md:h-20 w-auto object-contain invert dark:invert-0"
               />

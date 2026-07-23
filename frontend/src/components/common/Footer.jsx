@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 const Footer = ({ className = "" }) => {
   return (
@@ -11,13 +11,13 @@ const Footer = ({ className = "" }) => {
           © 2026 Invikt. All rights reserved.
         </div>
         <div className="flex gap-12 text-slate-500 dark:text-slate-600">
-          <Link to="#" className="hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
+          <Link href="#" className="hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
             Privacy
           </Link>
-          <Link to="#" className="hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
+          <Link href="#" className="hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
             Terms
           </Link>
-          <Link to="#" className="hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
+          <Link href="#" className="hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
             Security
           </Link>
         </div>

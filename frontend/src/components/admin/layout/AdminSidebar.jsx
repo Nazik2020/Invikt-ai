@@ -1,11 +1,13 @@
+"use client";
 import React from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import logo from "../../../assets/aspirev.png";
 import logoIcon from "../../../assets/aspirev.png";
 
 const AdminSidebar = ({ isCollapsed, toggle }) => {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const pathname = usePathname();
+  const router = useRouter();
 
   const menuItems = [
     { path: "/admin/dashboard",    name: "Overview",         icon: "dashboard"       },
@@ -17,8 +19,7 @@ const AdminSidebar = ({ isCollapsed, toggle }) => {
   ];
 
   const handleLogout = () => {
-    // Clear any auth state / tokens here in the future
-    navigate("/signin");
+    router.push("/signin");
   };
 
   return (
@@ -29,18 +30,18 @@ const AdminSidebar = ({ isCollapsed, toggle }) => {
     >
       {/* ── Header: Logo + Collapse toggle ── */}
       <div className="h-20 flex items-center px-4 justify-between border-b border-white/5 overflow-hidden shrink-0">
-        <Link to="/admin/dashboard" className="flex items-center gap-3 min-w-0 flex-1 overflow-hidden">
+        <Link href="/admin/dashboard" className="flex items-center gap-3 min-w-0 flex-1 overflow-hidden">
           {isCollapsed ? (
             /* Collapsed → icon-only logo */
             <img
-              src={logoIcon}
+              src={logoIcon.src}
               alt="Aspirev"
               className="h-6 w-auto object-contain shrink-0 invert dark:invert-0 scale-[1.5]"
             />
           ) : (
             /* Expanded → full logo */
             <img
-              src={logo}
+              src={logo.src}
               alt="Aspirev"
               className="h-8 w-auto object-contain shrink-0 max-w-[280px] invert dark:invert-0 scale-[1.5] origin-left"
             />

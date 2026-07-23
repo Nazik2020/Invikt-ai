@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import AuthLayout from "../layouts/AuthLayout";
 import logo from "../assets/aspirev.png";
 import { useAuth } from "../context/AuthContext";
@@ -52,10 +53,11 @@ const InputField = ({ label, type = "text", value, onChange, placeholder, requir
 const SignInPage = () => {
   const [showPassword, setShowPassword] = useState(false);
 
-  const navigate  = useNavigate();
-  const location  = useLocation();
-  const [successMessage, setSuccessMessage] = useState(location.state?.message || "");
-  const [email, setEmail]       = useState(location.state?.email || "");
+  const router  = useRouter();
+  const searchParams = useSearchParams();
+  const fromPage = searchParams.get("from") || "";
+  const [successMessage, setSuccessMessage] = useState(searchParams.get("message") || "");
+  const [email, setEmail]       = useState(searchParams.get("email") || "");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
@@ -88,11 +90,10 @@ const SignInPage = () => {
     try {
       const result = await login(email.trim(), password, rememberMe);
       if (result.success) {
-        // Admin users go to admin dashboard, regular users to dashboard
         if (result.user.role === "admin") {
-          navigate("/admin/dashboard");
+          router.push("/admin/dashboard");
         } else {
-          navigate("/dashboard");
+          router.push(fromPage || "/dashboard");
         }
       } else {
         setServerError(result.error || "Login failed. Please try again.");
@@ -107,8 +108,8 @@ const SignInPage = () => {
   const leftContent = (
     <div className="flex flex-col h-full">
       <div>
-        <Link to="/" className="inline-block mb-8 -ml-2">
-          <img src={logo} alt="Aspirev" className="h-16 md:h-20 w-auto object-contain invert dark:invert-0" />
+        <Link href="/" className="inline-block mb-8 -ml-2">
+          <img src={logo.src} alt="Aspirev" className="h-16 md:h-20 w-auto object-contain invert dark:invert-0" />
         </Link>
         <div className="max-w-lg">
           <h1 className="text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white leading-[1.1] tracking-tight mb-8">
@@ -222,7 +223,7 @@ const SignInPage = () => {
               <label className="text-[11px] uppercase tracking-wider font-bold text-slate-600 dark:text-white/60">
                 Password *
               </label>
-              <Link to="/forgot-password" className="text-[11px] font-bold text-slate-600 dark:text-white/60 hover:text-slate-900 dark:text-white transition-colors">
+              <Link href="/forgot-password" className="text-[11px] font-bold text-slate-600 dark:text-white/60 hover:text-slate-900 dark:text-white transition-colors">
                 Forgot password?
               </Link>
             </div>
@@ -297,7 +298,7 @@ const SignInPage = () => {
         <div className="mt-8 text-center">
           <p className="text-sm text-slate-500 dark:text-white/50">
             Don't have an account?{" "}
-            <Link to="/signup" className="text-slate-900 dark:text-white font-bold hover:text-violet-400 transition-colors">
+            <Link href="/signup" className="text-slate-900 dark:text-white font-bold hover:text-violet-400 transition-colors">
               Sign Up Free
             </Link>
           </p>

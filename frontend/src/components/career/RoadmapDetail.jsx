@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useRouter } from "next/navigation";
 import RoadmapDiagram from "../roadmap/RoadmapDiagram";
 import { useAuth } from "../../context/AuthContext";
 import { roadmaps } from "../../data/roadmaps.js";
@@ -181,7 +181,7 @@ const StageCard = ({ stage, stageIndex, onSkillToggle }) => {
 
 const RoadmapDetail = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const { getAuthHeaders } = useAuth();
   const [roadmap, setRoadmap] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -193,7 +193,7 @@ const RoadmapDetail = () => {
       const importedRoadmap = roadmaps.find(r => r.id === id);
       
       if (!importedRoadmap) {
-        navigate('/career-path');
+        router.push('/career-path');
         return;
       }
 
@@ -307,7 +307,7 @@ const RoadmapDetail = () => {
     <div className="w-full max-w-7xl mx-auto space-y-10 pb-20 pt-8 px-4 md:px-8">
       {/* Back button */}
       <button
-        onClick={() => navigate("/career-path")}
+        onClick={() => router.push("/career-path")}
         className="flex items-center gap-2 text-slate-500 dark:text-white/40 hover:text-slate-700 dark:text-white/80 text-sm font-medium transition-colors"
       >
         <span className="material-symbols-outlined text-[18px]">

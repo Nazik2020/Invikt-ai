@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 const PortfolioNavbar = ({ data }) => {
   const [isDarkMode, setIsDarkMode] = useState(
@@ -29,7 +29,7 @@ const PortfolioNavbar = ({ data }) => {
         
         {/* Left: Branding */}
         <div className="flex items-center gap-2 font-sans text-[1.1rem]">
-          <Link to="/" className="font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors">Invikt</Link>
+          <Link href="/" className="font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors">Invikt</Link>
           <span className="text-gray-400 font-light">/</span>
           <span className="text-gray-800 dark:text-white font-semibold tracking-wide">{firstName}</span>
         </div>
@@ -57,7 +57,7 @@ const PortfolioNavbar = ({ data }) => {
             </span>
           </button>
           
-          <Link to="/" className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-violet-600 hover:from-blue-400 hover:to-violet-500 text-white text-[0.85rem] font-bold rounded shadow-[0_0_15px_rgba(139,92,246,0.4)] transition-all">
+          <Link href="/" className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-violet-600 hover:from-blue-400 hover:to-violet-500 text-white text-[0.85rem] font-bold rounded shadow-[0_0_15px_rgba(139,92,246,0.4)] transition-all">
             Create Your Portfolio Free
           </Link>
         </nav>
@@ -93,7 +93,7 @@ const PortfolioNavbar = ({ data }) => {
               <a href={data.resumeUrl} target="_blank" rel="noreferrer" onClick={() => setIsMobileMenuOpen(false)} className="block px-6 py-3.5 text-[1.05rem] font-serif font-medium text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white border-l-[4px] border-transparent hover:border-[#c497ff] hover:bg-gray-100 dark:hover:bg-white/5 transition-all">Resume</a>
             )}
             <div className="h-[1px] w-full bg-gray-200 dark:bg-white/10 my-2"></div>
-            <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="block px-6 py-3 text-[0.9rem] font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-violet-600 hover:bg-gray-100 dark:hover:bg-white/5 transition-all">
+            <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="block px-6 py-3 text-[0.9rem] font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-violet-600 hover:bg-gray-100 dark:hover:bg-white/5 transition-all">
               Create Your Portfolio
             </Link>
           </div>

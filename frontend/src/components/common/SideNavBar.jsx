@@ -1,10 +1,11 @@
+"use client";
 import React from "react";
-import { NavLink, Link } from "react-router-dom";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import logo from "../../assets/aspirev.png";
 import logoIcon from "../../assets/aspirev.png";
 import { useSidebar } from "../../context/SidebarContext";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 
 const v1Nav = [
   {
@@ -47,11 +48,12 @@ const v2Nav = [
 const SideNavBar = () => {
   const { isCollapsed, isMobileOpen, toggle, closeMobile } = useSidebar();
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    router.push("/");
   };
 
   const rawUsername = user?.username || "User";
@@ -80,9 +82,9 @@ const SideNavBar = () => {
         {/* Collapsed: icon-only logo centered above toggle */}
         {isCollapsed && !isMobileOpen ? (
           <>
-            <Link to="/" className="hover:opacity-80 transition-opacity flex justify-center">
+            <Link href="/" className="hover:opacity-80 transition-opacity flex justify-center">
               <img
-                src={logoIcon}
+                src={logoIcon.src}
                 alt="Aspirev"
                 className="h-6 w-auto object-contain invert dark:invert-0 scale-[1.5]"
               />
@@ -104,11 +106,11 @@ const SideNavBar = () => {
           /* Expanded: full logo left, toggle button right */
           <>
             <Link
-              to="/"
+              href="/"
               className="hover:opacity-80 transition-opacity shrink-0"
             >
               <img
-                src={logo}
+                src={logo.src}
                 alt="Aspirev"
                 className="h-8 w-auto object-contain invert dark:invert-0 scale-[1.5] origin-left"
               />
@@ -139,13 +141,15 @@ const SideNavBar = () => {
             </p>
           )}
           <nav className="flex flex-col gap-1 px-3">
-            {v1Nav.map((item) => (
-              <NavLink
+            {v1Nav.map((item) => {
+              const isActive = pathname === item.path || pathname.startsWith(item.path + "/");
+              return (
+              <Link
                 key={item.name}
-                to={item.path}
+                href={item.path}
                 title={isCollapsed && !isMobileOpen ? item.name : undefined}
                 onClick={closeMobile}
-                className={({ isActive }) =>
+                className={
                   `group relative flex items-center gap-3.5 py-2.5 rounded-xl transition-all duration-200
                                     ${isCollapsed && !isMobileOpen ? "justify-center px-0" : "px-3"}
                                     ${
@@ -155,8 +159,6 @@ const SideNavBar = () => {
                                     }`
                 }
               >
-                {({ isActive }) => (
-                  <>
                     {/* Active left indicator — expanded only */}
                     {isActive && isExpanded && (
                       <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-primary" />
@@ -183,10 +185,9 @@ const SideNavBar = () => {
                         </span>
                       </div>
                     )}
-                  </>
-                )}
-              </NavLink>
-            ))}
+              </Link>
+              );
+            })}
           </nav>
         </div>
 
@@ -267,8 +268,8 @@ const SideNavBar = () => {
       <div className="border-t border-slate-200 dark:border-white/5">
         {!isExpanded ? (
           <div className="flex flex-col items-center gap-1 py-3">
-            <NavLink
-              to="/settings"
+            <Link
+              href="/settings"
               title="Settings"
               className="w-10 h-10 flex items-center justify-center rounded-xl text-slate-500 dark:text-white/40 hover:bg-slate-100 dark:bg-white/5 hover:text-slate-700 dark:text-white/80 transition-all"
             >
@@ -278,7 +279,7 @@ const SideNavBar = () => {
               >
                 settings
               </span>
-            </NavLink>
+            </Link>
             <button
               onClick={handleLogout}
               title="Log out"
@@ -307,8 +308,8 @@ const SideNavBar = () => {
         ) : (
           <>
             <div className="flex items-center gap-1 px-3 pt-2">
-              <NavLink
-                to="/settings"
+              <Link
+                href="/settings"
                 className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-slate-500 dark:text-white/40 hover:bg-slate-100 dark:bg-white/5 hover:text-slate-700 dark:text-white/80 transition-all text-xs font-medium"
               >
                 <span
@@ -318,7 +319,7 @@ const SideNavBar = () => {
                   settings
                 </span>
                 Settings
-              </NavLink>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-slate-500 dark:text-white/40 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400 transition-all text-xs font-medium"

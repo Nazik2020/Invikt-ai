@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import AuthLayout from "../layouts/AuthLayout";
 import logo from "../assets/aspirev.png";
 import elena from "../assets/aspirev.png"; // Fallback for avatar
@@ -11,9 +11,9 @@ const ResetPasswordPage = () => {
     <div className="flex flex-col h-full justify-between items-center text-center">
       <div className="flex flex-col items-center max-w-md w-full my-auto">
         {/* Logo */}
-        <Link to="/" className="inline-block mb-8 -ml-2">
+        <Link href="/" className="inline-block mb-8 -ml-2">
           <img
-            src={logo}
+            src={logo.src}
             alt="Aspirev"
             className="h-16 md:h-20 w-auto object-contain invert dark:invert-0"
           />
@@ -48,7 +48,7 @@ const ResetPasswordPage = () => {
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded-full bg-white dark:bg-[#1c1d22] border border-slate-200 dark:border-white/10 overflow-hidden shrink-0">
               <img
-                src={logo}
+                src={logo.src}
                 alt="Elena Vance"
                 className="w-full h-full object-cover opacity-80"
               />
@@ -132,7 +132,7 @@ const ResetPasswordPage = () => {
 
         <div className="mt-10 text-center">
           <Link
-            to="/signin"
+            href="/signin"
             className="inline-flex items-center text-[14px] text-slate-600 dark:text-white/60 hover:text-slate-900 dark:text-white font-medium transition-colors group"
           >
             <span className="material-symbols-outlined text-[18px] mr-2 group-hover:-translate-x-1 transition-transform">

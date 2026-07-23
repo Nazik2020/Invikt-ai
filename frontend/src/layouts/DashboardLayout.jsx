@@ -1,5 +1,5 @@
 import React from "react";
-import { Outlet, Link } from "react-router-dom";
+import Link from "next/link";
 import SideNavBar from "../components/common/SideNavBar";
 import Footer from "../components/common/Footer";
 import { SidebarProvider, useSidebar } from "../context/SidebarContext";
@@ -7,7 +7,7 @@ import { SidebarProvider, useSidebar } from "../context/SidebarContext";
 import logo from "../assets/aspirev.png";
 
 // Inner layout that consumes the sidebar context
-const DashboardContent = () => {
+const DashboardContent = ({ children }) => {
   const { isCollapsed, isMobileOpen, toggleMobile, closeMobile } = useSidebar();
 
   return (
@@ -31,8 +31,8 @@ const DashboardContent = () => {
 
       {/* Mobile Header (Hidden on md+) */}
       <div className="md:hidden flex items-center justify-between px-5 py-3 bg-white dark:bg-[#1c1c1f] border-b border-slate-200 dark:border-white/5 relative z-40">
-        <Link to="/" className="flex items-center">
-          <img src={logo} alt="Aspirev" className="h-8 w-auto object-contain invert dark:invert-0 scale-[1.5] origin-left" />
+        <Link href="/" className="flex items-center">
+          <img src={logo.src} alt="Aspirev" className="h-8 w-auto object-contain invert dark:invert-0 scale-[1.5] origin-left" />
         </Link>
         <button
           onClick={toggleMobile}
@@ -46,7 +46,7 @@ const DashboardContent = () => {
         className={`flex-1 min-w-0 flex flex-col min-h-0 overflow-y-auto overflow-x-hidden relative z-10 transition-all duration-300 ease-in-out md:ml-0 ${isCollapsed ? "md:ml-20" : "md:ml-72"}`}
       >
         <main className="flex-1 w-full max-w-screen-2xl mx-auto px-4 md:px-8 pt-6 md:pt-10 pb-20">
-          <Outlet />
+          {children}
         </main>
         <Footer />
       </div>
@@ -55,9 +55,9 @@ const DashboardContent = () => {
 };
 
 // Wrap everything in the provider
-const DashboardLayout = () => (
+const DashboardLayout = ({ children }) => (
   <SidebarProvider>
-    <DashboardContent />
+    <DashboardContent>{children}</DashboardContent>
   </SidebarProvider>
 );
 

@@ -1,9 +1,8 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
 import TopNavBar from "../components/common/TopNavBar";
 import Footer from "../components/common/Footer";
 
-const PublicLayout = () => {
+const PublicLayout = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col relative w-full overflow-x-hidden">
       {/* Background Orbs base layer */}
@@ -15,7 +14,7 @@ const PublicLayout = () => {
       <TopNavBar />
 
       <main className="flex-1 w-full pt-20 relative z-10">
-        <Outlet />
+        {children}
       </main>
 
       <Footer className="relative z-10" />

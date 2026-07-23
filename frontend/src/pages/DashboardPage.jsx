@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import { API_URL } from "../config/api";
 import { roadmaps } from "../data/roadmaps.js";
 
 const DashboardPage = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { user, authFetch } = useAuth();
   
   const rawUsername = user?.username || "User";
@@ -135,7 +135,7 @@ const DashboardPage = () => {
           </p>
         </div>
         <button
-          onClick={() => navigate(`/career-path/${activeRoadmap?.roadmapId || 'frontend'}`)}
+          onClick={() => router.push(`/career-path/${activeRoadmap?.roadmapId || 'frontend'}`)}
           className="shrink-0 flex items-center justify-center gap-2 px-6 py-3 rounded-full
                                bg-gradient-to-br from-violet-600 to-purple-500 hover:from-violet-500 hover:to-purple-400
                                text-slate-900 dark:text-white text-sm font-bold shadow-[0_10px_25px_rgba(93,33,223,0.25)] hover:scale-102 transition-all"
@@ -420,7 +420,7 @@ const DashboardPage = () => {
             ))}
           </div>
 
-          <button onClick={() => navigate("/job-tracker")} className="w-full py-2.5 rounded-xl border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:border-white/20 bg-white/3 hover:bg-slate-100 dark:hover:bg-white/5 text-[0.8rem] font-bold text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white transition-all">
+          <button onClick={() => router.push("/job-tracker")} className="w-full py-2.5 rounded-xl border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:border-white/20 bg-white/3 hover:bg-slate-100 dark:hover:bg-white/5 text-[0.8rem] font-bold text-slate-600 dark:text-white/60 hover:text-slate-900 dark:hover:text-white transition-all">
             View All Applications
           </button>
         </div>
@@ -429,7 +429,7 @@ const DashboardPage = () => {
       {/* ── Bottom Quick Actions Row (4 Columns) ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <div
-          onClick={() => navigate("/job-tracker")}
+          onClick={() => router.push("/job-tracker")}
           className="p-5 rounded-2xl bg-white dark:bg-[#1e1f23]/40 border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none hover:border-slate-200 dark:border-white/10 hover:shadow hover:bg-slate-50 dark:hover:bg-[#24252a]/50 cursor-pointer flex gap-4 items-center transition-all group"
         >
           <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/8 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
@@ -448,7 +448,7 @@ const DashboardPage = () => {
         </div>
 
         <div
-          onClick={() => navigate(`/career-path/${activeRoadmap?.roadmapId || 'frontend'}`)}
+          onClick={() => router.push(`/career-path/${activeRoadmap?.roadmapId || 'frontend'}`)}
           className="p-5 rounded-2xl bg-white dark:bg-[#1e1f23]/40 border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none hover:border-slate-200 dark:border-white/10 hover:shadow hover:bg-slate-50 dark:hover:bg-[#24252a]/50 cursor-pointer flex gap-4 items-center transition-all group"
         >
           <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/8 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
@@ -467,7 +467,7 @@ const DashboardPage = () => {
         </div>
 
         <div
-          onClick={() => navigate("/career-path")}
+          onClick={() => router.push("/career-path")}
           className="p-5 rounded-2xl bg-white dark:bg-[#1e1f23]/40 border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none hover:border-slate-200 dark:border-white/10 hover:shadow hover:bg-slate-50 dark:hover:bg-[#24252a]/50 cursor-pointer flex gap-4 items-center transition-all group"
         >
           <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/8 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
@@ -486,7 +486,7 @@ const DashboardPage = () => {
         </div>
 
         <div
-          onClick={() => navigate("/portfolio")}
+          onClick={() => router.push("/portfolio")}
           className="p-5 rounded-2xl bg-white dark:bg-[#1e1f23]/40 border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none hover:border-slate-200 dark:border-white/10 hover:shadow hover:bg-slate-50 dark:hover:bg-[#24252a]/50 cursor-pointer flex gap-4 items-center transition-all group"
         >
           <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/8 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">

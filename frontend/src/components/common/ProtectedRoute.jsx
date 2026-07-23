@@ -1,10 +1,12 @@
+"use client";
 import React from 'react';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 
-const ProtectedRoute = () => {
+const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
-  const location = useLocation();
+  const router = useRouter();
+  const pathname = usePathname();
 
   if (loading) {
     return (
@@ -16,10 +18,11 @@ const ProtectedRoute = () => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/signin" state={{ from: location }} replace />;
+    router.replace(`/signin?from=${encodeURIComponent(pathname)}`);
+    return null;
   }
 
-  return <Outlet />;
+  return children;
 };
 
 export default ProtectedRoute;

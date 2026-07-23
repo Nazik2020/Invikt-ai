@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "next/navigation";
 import { API_URL } from "../../config/api";
 import PortfolioNavbar from "../../components/public-portfolio/PortfolioNavbar/PortfolioNavbar";
 import PortfolioHero from "../../components/public-portfolio/PortfolioHero/PortfolioHero";

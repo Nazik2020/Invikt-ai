@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 const AIFeedbackReport = () => {
   return (
@@ -72,7 +72,7 @@ const AIFeedbackReport = () => {
           </div>
         </div>
 
-        <Link to="/career-path" className="block text-center w-full py-4 glass-panel dark:border-white/10 border-slate-200 bg-white/60 dark:bg-transparent rounded-lg border border-slate-200 dark:border-outline-variant/20 font-headline font-bold text-sm text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors relative z-10">
+        <Link href="/career-path" className="block text-center w-full py-4 glass-panel dark:border-white/10 border-slate-200 bg-white/60 dark:bg-transparent rounded-lg border border-slate-200 dark:border-outline-variant/20 font-headline font-bold text-sm text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors relative z-10">
           Generate Full Roadmap
         </Link>
       </div>

@@ -1,0 +1,22 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "aspirev-backend-bhe7g2fdabbycbap.eastus-01.azurewebsites.net",
+      },
+      {
+        protocol: "https",
+        hostname: "invikt-backend.onrender.com",
+      },
+      {
+        protocol: "https",
+        hostname: "**.blob.core.windows.net",
+      },
+    ],
+  },
+};
+
+export default nextConfig;

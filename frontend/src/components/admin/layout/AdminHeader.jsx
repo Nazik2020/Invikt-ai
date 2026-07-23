@@ -1,5 +1,7 @@
+"use client";
 import React, { useState, useEffect } from "react";
-import { useLocation, Link } from "react-router-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const AdminHeader = ({ toggleSidebar }) => {
   const [theme, setTheme] = useState(() => {
@@ -9,8 +11,8 @@ const AdminHeader = ({ toggleSidebar }) => {
     return "dark";
   });
 
-  const location = useLocation();
-  const isUsersPage = location.pathname.includes("/admin/users");
+  const pathname = usePathname();
+  const isUsersPage = pathname.includes("/admin/users");
 
   useEffect(() => {
     const root = document.documentElement;
@@ -43,13 +45,13 @@ const AdminHeader = ({ toggleSidebar }) => {
         {/* Dynamic Route Tabs */}
         {isUsersPage ? (
           <nav className="hidden md:flex items-center gap-8 h-full">
-            <Link to="/admin/users" className="h-full flex items-center text-[11px] font-black uppercase tracking-widest text-[#00daf3] border-b-2 border-[#00daf3]">
+            <Link href="/admin/users" className="h-full flex items-center text-[11px] font-black uppercase tracking-widest text-[#00daf3] border-b-2 border-[#00daf3]">
               Users
             </Link>
-            <Link to="/admin/users" className="h-full flex items-center text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors">
+            <Link href="/admin/users" className="h-full flex items-center text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors">
               Permissions
             </Link>
-            <Link to="/admin/users" className="h-full flex items-center text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors">
+            <Link href="/admin/users" className="h-full flex items-center text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors">
               Logs
             </Link>
           </nav>

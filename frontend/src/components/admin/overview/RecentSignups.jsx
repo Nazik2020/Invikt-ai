@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 const SKELETON_COUNT = 5;
 
@@ -32,7 +32,7 @@ const RecentSignups = ({ signups, loading }) => {
           Recent Signups
         </h3>
         <Link
-          to="/admin/users"
+          href="/admin/users"
           className="text-xs font-bold text-violet-500 hover:text-violet-600 dark:text-cyan-400 dark:hover:text-cyan-300 transition-colors uppercase tracking-wider"
         >
           View All

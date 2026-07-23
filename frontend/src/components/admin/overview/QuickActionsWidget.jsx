@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 const QuickActionsWidget = () => {
   return (
@@ -18,7 +18,7 @@ const QuickActionsWidget = () => {
 
       <div className="space-y-3 flex-grow flex flex-col justify-center">
         <Link
-          to="/admin/roadmaps"
+          href="/admin/roadmaps"
           className="w-full bg-gradient-to-br from-[#814df3] to-[#5d21df] text-white py-3 px-4 rounded-xl text-xs font-bold shadow-[0_4px_15px_rgba(93,33,223,0.35)] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-between"
         >
           <span>Add New Roadmap</span>
@@ -26,7 +26,7 @@ const QuickActionsWidget = () => {
         </Link>
 
         <Link
-          to="/admin/users"
+          href="/admin/users"
           className="w-full border border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 bg-slate-50 dark:bg-[#16171d]/60 text-slate-800 dark:text-white py-3 px-4 rounded-xl text-xs font-bold hover:bg-slate-100 dark:hover:bg-[#16171d] transition-all flex items-center justify-between"
         >
           <span>Manage Users</span>
@@ -37,13 +37,13 @@ const QuickActionsWidget = () => {
 
         <div className="grid grid-cols-2 gap-3 mt-1">
           <Link
-            to="/admin/applications"
+            href="/admin/applications"
             className="border border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 py-2.5 rounded-xl text-[10px] font-bold text-slate-600 dark:text-white/70 hover:text-slate-900 dark:hover:text-white transition-all text-center"
           >
             Export User List
           </Link>
           <Link
-            to="/admin/security"
+            href="/admin/security"
             className="border border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 py-2.5 rounded-xl text-[10px] font-bold text-slate-600 dark:text-white/70 hover:text-slate-900 dark:hover:text-white transition-all text-center"
           >
             Security Logs
