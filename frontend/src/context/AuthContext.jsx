@@ -1,4 +1,4 @@
-﻿import React, { createContext, useState, useEffect, useContext, useCallback, useRef } from "react";
+import React, { createContext, useState, useEffect, useContext, useCallback, useRef } from "react";
 
 import { API_URL } from "../config/api";
 
@@ -322,6 +322,26 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
+  const handleOAuthLogin = async (accessToken, refreshToken) => {
+    storeTokens(accessToken, refreshToken, true);
+    refreshTokenRef.current = refreshToken;
+    setToken(accessToken);
+    setIsRemembered(true);
+    try {
+      const userRes = await fetch(`${API_URL}/auth/me`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const userJson = await userRes.json();
+      if (userJson.success && userJson.user) {
+        setUser(userJson.user);
+        return { success: true, user: userJson.user };
+      }
+    } catch (err) {
+      console.error("Failed to fetch user after OAuth login", err);
+    }
+    return { success: false };
+  };
+
   const isAuthenticated = !!user && !!token;
 
   return (
@@ -338,6 +358,7 @@ export const AuthProvider = ({ children }) => {
         getAuthHeaders,
         authFetch,
         updateUser,
+        handleOAuthLogin,
       }}
     >
       {children}

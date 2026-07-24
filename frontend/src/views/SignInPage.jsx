@@ -1,9 +1,10 @@
-﻿import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import AuthLayout from "../layouts/AuthLayout";
 import logo from "../assets/aspirev.png";
 import { useAuth } from "../context/AuthContext";
+import { API_URL } from "../config/api";
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 const GoogleIcon = () => (
@@ -63,7 +64,45 @@ const SignInPage = () => {
   const [fieldErrors, setFieldErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [loading, setLoading]   = useState(false);
-  const { login } = useAuth();
+  const { login, handleOAuthLogin } = useAuth();
+
+  useEffect(() => {
+    const tokenFromUrl = searchParams.get("token");
+    const refreshTokenFromUrl = searchParams.get("refreshToken");
+    const errorFromUrl = searchParams.get("error");
+
+    if (errorFromUrl) {
+      if (errorFromUrl === "account_deactivated") {
+        setServerError("Your account has been suspended. Please contact support.");
+      } else if (errorFromUrl === "no_email_provided" || errorFromUrl === "no_github_email") {
+        setServerError("Could not retrieve a valid email address from your social profile.");
+      } else {
+        setServerError("Authentication failed or was cancelled.");
+      }
+    } else if (tokenFromUrl && refreshTokenFromUrl) {
+      setLoading(true);
+      handleOAuthLogin(tokenFromUrl, refreshTokenFromUrl).then((res) => {
+        if (res.success) {
+          if (res.user?.role === "admin") {
+            router.push("/admin/dashboard");
+          } else {
+            router.push(fromPage || "/dashboard");
+          }
+        } else {
+          setServerError("Failed to authenticate session with Google.");
+          setLoading(false);
+        }
+      });
+    }
+  }, [searchParams, handleOAuthLogin, router, fromPage]);
+
+  const handleGoogleSignIn = () => {
+    window.location.href = `${API_URL}/auth/google`;
+  };
+
+  const handleGitHubSignIn = () => {
+    window.location.href = `${API_URL}/auth/github`;
+  };
 
   const validate = () => {
     const errors = {};
@@ -73,7 +112,7 @@ const SignInPage = () => {
     if (!password) errors.password = "Password is required.";
     
     return errors;
-  }
+  };
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -187,10 +226,10 @@ const SignInPage = () => {
         )}
 
         <div className="grid grid-cols-2 gap-4 mb-6">
-          <button type="button" className="flex items-center justify-center py-2.5 px-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors text-sm font-semibold text-slate-900 dark:text-white">
+          <button onClick={handleGoogleSignIn} type="button" className="flex items-center justify-center py-2.5 px-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors text-sm font-semibold text-slate-900 dark:text-white">
             <GoogleIcon />Google
           </button>
-          <button type="button" className="flex items-center justify-center py-2.5 px-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors text-sm font-semibold text-slate-900 dark:text-white">
+          <button onClick={handleGitHubSignIn} type="button" className="flex items-center justify-center py-2.5 px-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors text-sm font-semibold text-slate-900 dark:text-white">
             <GitHubIcon />GitHub
           </button>
         </div>

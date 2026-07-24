@@ -264,3 +264,230 @@ exports.changePassword = async (req, res, next) => {
     next(error);
   }
 };
+
+const getBackendUrl = (req) => {
+  if (process.env.BACKEND_URL) return process.env.BACKEND_URL;
+  return `http://localhost:${process.env.PORT || 5000}`;
+};
+
+const getFrontendUrl = () => {
+  return process.env.FRONTEND_URL || "http://localhost:3000";
+};
+
+exports.googleAuth = (req, res) => {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const redirectUri = `${getBackendUrl(req)}/api/auth/google/callback`;
+  const scope = encodeURIComponent("email profile");
+  const googleUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}`;
+  
+  res.redirect(googleUrl);
+};
+
+exports.googleCallback = async (req, res, next) => {
+  const frontendUrl = getFrontendUrl();
+  try {
+    const { code, error: googleErr } = req.query;
+
+    if (googleErr || !code) {
+      return res.redirect(`${frontendUrl}/signin?error=${encodeURIComponent(googleErr || "google_cancelled")}`);
+    }
+
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    const redirectUri = `${getBackendUrl(req)}/api/auth/google/callback`;
+
+    // 1. Exchange authorization code for tokens
+    const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        code,
+        client_id: clientId,
+        client_secret: clientSecret,
+        redirect_uri: redirectUri,
+        grant_type: "authorization_code",
+      }),
+    });
+
+    const tokenData = await tokenRes.json();
+    if (!tokenData.access_token) {
+      console.error("Google Token Exchange Failed:", tokenData);
+      return res.redirect(`${frontendUrl}/signin?error=token_exchange_failed`);
+    }
+
+    // 2. Fetch User Profile from Google
+    const userRes = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    });
+    const profile = await userRes.json();
+
+    if (!profile.email) {
+      return res.redirect(`${frontendUrl}/signin?error=no_email_provided`);
+    }
+
+    // 3. Find or Create User
+    let user = await User.findOne({
+      $or: [{ googleId: profile.id }, { email: profile.email.toLowerCase() }],
+    });
+
+    if (user && user.isDeactivated) {
+      return res.redirect(`${frontendUrl}/signin?error=account_deactivated`);
+    }
+
+    if (!user) {
+      const emailPrefix = profile.email.split("@")[0].replace(/[^a-zA-Z0-9_]/g, "");
+      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+      const username = `${emailPrefix}_${randomSuffix}`.toLowerCase();
+
+      user = await User.create({
+        firstName: profile.given_name || profile.name || "Google",
+        lastName: profile.family_name || "User",
+        username,
+        email: profile.email.toLowerCase(),
+        googleId: profile.id,
+        authProvider: "google",
+        profilePicture: profile.picture || "",
+      });
+    } else if (!user.googleId) {
+      user.googleId = profile.id;
+      if (!user.profilePicture && profile.picture) {
+        user.profilePicture = profile.picture;
+      }
+      await user.save();
+    }
+
+    // 4. Generate Aspirev JWTs
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
+
+    // 5. Redirect back to frontend with tokens
+    res.redirect(`${frontendUrl}/signin?token=${accessToken}&refreshToken=${refreshToken}`);
+  } catch (error) {
+    console.error("Google Auth Error:", error);
+    res.redirect(`${frontendUrl}/signin?error=google_auth_failed`);
+  }
+};
+
+exports.githubAuth = (req, res) => {
+  const clientId = process.env.GITHUB_CLIENT_ID;
+  const redirectUri = `${getBackendUrl(req)}/api/auth/github/callback`;
+  const githubUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user:email`;
+  
+  res.redirect(githubUrl);
+};
+
+exports.githubCallback = async (req, res, next) => {
+  const frontendUrl = getFrontendUrl();
+  try {
+    const { code, error: githubErr } = req.query;
+
+    if (githubErr || !code) {
+      return res.redirect(`${frontendUrl}/signin?error=${encodeURIComponent(githubErr || "github_cancelled")}`);
+    }
+
+    const clientId = process.env.GITHUB_CLIENT_ID;
+    const clientSecret = process.env.GITHUB_CLIENT_SECRET;
+    const redirectUri = `${getBackendUrl(req)}/api/auth/github/callback`;
+
+    // 1. Exchange authorization code for token
+    const tokenRes = await fetch("https://github.com/login/oauth/access_token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        client_id: clientId,
+        client_secret: clientSecret,
+        code,
+        redirect_uri: redirectUri,
+      }),
+    });
+
+    const tokenData = await tokenRes.json();
+    if (!tokenData.access_token) {
+      console.error("GitHub Token Exchange Failed:", tokenData);
+      return res.redirect(`${frontendUrl}/signin?error=github_token_failed`);
+    }
+
+    // 2. Fetch User Profile from GitHub
+    const userRes = await fetch("https://api.github.com/user", {
+      headers: {
+        Authorization: `Bearer ${tokenData.access_token}`,
+        "User-Agent": "Aspirev-App",
+      },
+    });
+    const profile = await userRes.json();
+
+    let userEmail = profile.email;
+
+    // If GitHub email is marked private, fetch primary email from emails endpoint
+    if (!userEmail) {
+      const emailRes = await fetch("https://api.github.com/user/emails", {
+        headers: {
+          Authorization: `Bearer ${tokenData.access_token}`,
+          "User-Agent": "Aspirev-App",
+        },
+      });
+      const emails = await emailRes.json();
+      if (Array.isArray(emails)) {
+        const primary = emails.find((e) => e.primary && e.verified) || emails[0];
+        if (primary) userEmail = primary.email;
+      }
+    }
+
+    if (!userEmail) {
+      return res.redirect(`${frontendUrl}/signin?error=no_github_email`);
+    }
+
+    const githubIdStr = String(profile.id);
+
+    // 3. Find or Create User
+    let user = await User.findOne({
+      $or: [{ githubId: githubIdStr }, { email: userEmail.toLowerCase() }],
+    });
+
+    if (user && user.isDeactivated) {
+      return res.redirect(`${frontendUrl}/signin?error=account_deactivated`);
+    }
+
+    if (!user) {
+      const nameParts = (profile.name || profile.login || "GitHub User").trim().split(" ");
+      const firstName = nameParts[0] || "GitHub";
+      const lastName = nameParts.slice(1).join(" ") || "User";
+      
+      const cleanUsername = (profile.login || userEmail.split("@")[0]).replace(/[^a-zA-Z0-9_]/g, "");
+      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+      const username = `${cleanUsername}_${randomSuffix}`.toLowerCase();
+
+      user = await User.create({
+        firstName,
+        lastName,
+        username,
+        email: userEmail.toLowerCase(),
+        githubId: githubIdStr,
+        authProvider: "github",
+        profilePicture: profile.avatar_url || "",
+      });
+    } else if (!user.githubId) {
+      user.githubId = githubIdStr;
+      if (!user.profilePicture && profile.avatar_url) {
+        user.profilePicture = profile.avatar_url;
+      }
+      await user.save();
+    }
+
+    // 4. Generate Aspirev JWTs
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
+
+    // 5. Redirect back to frontend with tokens
+    res.redirect(`${frontendUrl}/signin?token=${accessToken}&refreshToken=${refreshToken}`);
+  } catch (error) {
+    console.error("GitHub Auth Error:", error);
+    res.redirect(`${frontendUrl}/signin?error=github_auth_failed`);
+  }
+};
+
+
+

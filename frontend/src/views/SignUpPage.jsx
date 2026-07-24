@@ -1,9 +1,10 @@
-﻿import React, { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AuthLayout from "../layouts/AuthLayout";
 import logo from "../assets/aspirev.png";
 import { useAuth } from "../context/AuthContext";
+import { API_URL } from "../config/api";
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 const GoogleIcon = () => (
@@ -211,10 +212,10 @@ const SignUpPage = () => {
 
         {/* Social Auth */}
         <div className="grid grid-cols-2 gap-3 mb-7">
-          <button type="button" className="flex items-center justify-center py-2.5 px-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors text-sm font-semibold text-slate-900 dark:text-white">
+          <button onClick={() => window.location.href = `${API_URL}/auth/google`} type="button" className="flex items-center justify-center py-2.5 px-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors text-sm font-semibold text-slate-900 dark:text-white">
             <GoogleIcon />Google
           </button>
-          <button type="button" className="flex items-center justify-center py-2.5 px-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors text-sm font-semibold text-slate-900 dark:text-white">
+          <button onClick={() => window.location.href = `${API_URL}/auth/github`} type="button" className="flex items-center justify-center py-2.5 px-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors text-sm font-semibold text-slate-900 dark:text-white">
             <GitHubIcon />GitHub
           </button>
         </div>

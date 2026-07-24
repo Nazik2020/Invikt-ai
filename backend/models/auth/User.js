@@ -35,8 +35,23 @@ const userSchema = new mongoose.Schema(
     },
     passwordHash: {
       type: String,
-      required: [true, "Password is required"],
+      required: function() {
+        return !this.googleId && !this.githubId;
+      },
       select: false, // Never return password hash in queries
+    },
+    googleId: {
+      type: String,
+      default: null,
+    },
+    githubId: {
+      type: String,
+      default: null,
+    },
+    authProvider: {
+      type: String,
+      enum: ["local", "google", "github"],
+      default: "local",
     },
     profilePicture: {
       type: String,
